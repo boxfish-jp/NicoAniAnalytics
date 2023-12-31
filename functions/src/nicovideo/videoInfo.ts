@@ -1,4 +1,4 @@
-import {XMLParser} from "fast-xml-parser";
+import { XMLParser } from "fast-xml-parser";
 
 type videoinfoType = {
   xml: string;
@@ -8,7 +8,7 @@ type videoinfoType = {
       title: string;
       description: string;
       thumbnail_url: string;
-      first_retrieve: string;
+      first_retrieve: Date;
       length: string;
       movie_type: string;
       size_high: number;
@@ -71,18 +71,18 @@ const videoInfo = async (videoId: string, db: FirebaseFirestore.Firestore) => {
         description: "",
         viewer: 0,
         thumb: "",
-        postDate: "",
+        postDate: new Date(),
       };
     }
 
-    return {title, description, viewer, thumb, postDate};
+    return { title, description, viewer, thumb, postDate };
   } catch (e) {
     return {
       title: "delete",
       description: "",
       viewer: 0,
       thumb: "",
-      postDate: "",
+      postDate: new Date(),
     };
   }
 };
