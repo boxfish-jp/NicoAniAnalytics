@@ -1,5 +1,6 @@
 import Image from "next/image";
-import db from "@/lib/firebase";
+import { db } from "@/lib/firebase";
+import { collection, doc, getDoc } from "firebase/firestore"; // Import the 'doc' function from the correct package
 
 const Home = async () => {
   await datafetch();
@@ -7,8 +8,12 @@ const Home = async () => {
 };
 
 const datafetch = async () => {
-  const data = await db.collection("dbConfig").doc("NowSeason").get();
-  console.log(data);
+  const dataRef = db.collection("dbConfig").doc("checkChannelId");
+  const snapshot = await dataRef.get();
+  console.log(snapshot.data());
+  //onst snapshot = await getDoc(dataRef);
+  //const data = snapshot.data();
+  //console.log(data);
 };
 
 export default Home;
