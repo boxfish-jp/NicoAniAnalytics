@@ -195,6 +195,7 @@ export const updateViewCount = onSchedule(
     const nextDocument = {
       id: nextChannel,
       story: nextStory,
+      updateDay: new Date().getDate(),
     };
     await dbConfig.doc("checkChannelId").set(nextDocument);
   }
