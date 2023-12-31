@@ -1,4 +1,4 @@
-import { XMLParser } from "fast-xml-parser";
+import {XMLParser} from "fast-xml-parser";
 
 type videoinfoType = {
   xml: string;
@@ -75,7 +75,7 @@ const videoInfo = async (videoId: string, db: FirebaseFirestore.Firestore) => {
       };
     }
 
-    return { title, description, viewer, thumb, postDate };
+    return {title, description, viewer, thumb, postDate};
   } catch (e) {
     return {
       title: "delete",

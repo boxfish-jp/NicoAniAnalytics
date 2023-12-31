@@ -6,14 +6,14 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-import { initializeApp } from "firebase-admin/app";
+import {initializeApp} from "firebase-admin/app";
 initializeApp();
 
 // import { onRequest } from "firebase-functions/v2/https";
-import { onSchedule } from "firebase-functions/v2/scheduler";
+import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
-import { getFirestore } from "firebase-admin/firestore";
+import {getFirestore} from "firebase-admin/firestore";
 
 import updateStreaming from "./updateStreaming";
 import getChannels from "./getChannels";
@@ -27,10 +27,10 @@ const Nanime = "https://anime.nicovideo.jp/period/now.html";
 const db = getFirestore();
 
 export const CheckStreaming = onSchedule(
-  { schedule: "every day 00:00", timeoutSeconds: 300 },
+  {schedule: "every day 00:00", timeoutSeconds: 300},
   async () => {
     const before = new Date().getTime();
-    logger.info("Hello logs!", { structuredData: true });
+    logger.info("Hello logs!", {structuredData: true});
 
     // ChList DBの初期化
     const channeldic = await getChannels(Nanime);
@@ -90,7 +90,7 @@ export const CheckStreaming = onSchedule(
 );
 
 export const updateViewCount = onSchedule(
-  { schedule: "every 5 minutes", timeoutSeconds: 300 },
+  {schedule: "every 5 minutes", timeoutSeconds: 300},
   async () => {
     const dbConfig = db.collection("dbConfig");
     const checkChannelInfo = (
@@ -103,9 +103,9 @@ export const updateViewCount = onSchedule(
     const SeasonCollection = season + "-ChList";
     const channels = await getAllChList(SeasonCollection);
     const channelId =
-      checkChannelInfo == undefined || String(checkChannelInfo.id) == "done"
-        ? channels[0]
-        : String(checkChannelInfo.id);
+      checkChannelInfo == undefined || String(checkChannelInfo.id) == "done" ?
+        channels[0] :
+        String(checkChannelInfo.id);
 
     const updateDay =
       checkChannelInfo != undefined ? Number(checkChannelInfo.updateDay) : 0;
