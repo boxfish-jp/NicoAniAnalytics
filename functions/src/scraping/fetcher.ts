@@ -11,7 +11,7 @@ const fetcher = async (url: string) => {
   const now = getDate.getTime();
 
   if (LastFetch != undefined) {
-    while (new Date().getTime() - Number(LastFetch) < 1000 * 0.5) {
+    while (new Date().getTime() - Number(LastFetch) < 1000 * 5) {
       await new Promise((resolve) => setTimeout(resolve, 1));
     }
   }

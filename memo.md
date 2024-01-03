@@ -37,3 +37,6 @@ xml形式で返ってくる
 
 # ニコニコプッシュ通知
 https://github.com/guest-nico/nicoLiveCheckTool/blob/master/push.md
+
+# チャンネルページから動画一覧を取得する
+https://ch.nicovideo.jp/ichigoproduction/video
