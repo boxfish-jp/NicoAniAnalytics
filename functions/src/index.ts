@@ -14,6 +14,7 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 
 import {getFirestore} from "firebase-admin/firestore";
 
+import {scheduleTime1, scheduleTime2} from "./scheduleTime";
 import getCh from "./GetCh";
 import chVideos from "./chVideos";
 
@@ -25,7 +26,7 @@ const Nanime = "https://anime.nicovideo.jp/period/now.html";
 const db = getFirestore();
 
 export const CheckStreaming = onSchedule(
-  {schedule: "every day 15:50", timeoutSeconds: 300},
+  {schedule: scheduleTime1, timeoutSeconds: 300},
   async () => {
     const before = new Date().getTime();
     // logger.info("Hello logs!", {structuredData: true});
@@ -82,7 +83,7 @@ export const CheckStreaming = onSchedule(
 );
 
 export const updateViewCount = onSchedule(
-  {schedule: "every day 16:15", timeoutSeconds: 540},
+  {schedule: scheduleTime2, timeoutSeconds: 540},
   async () => {
     const dbConfig = db.collection("dbConfig");
     const checkSeason = (await dbConfig.doc("nowSeason").get()).data();
