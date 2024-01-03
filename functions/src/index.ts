@@ -14,7 +14,7 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 
 import {getFirestore} from "firebase-admin/firestore";
 
-import {scheduleTime1, scheduleTime2} from "./scheduleTime";
+import {scheduleTime1} from "./scheduleTime";
 import getCh from "./GetCh";
 import chVideos from "./chVideos";
 
@@ -26,19 +26,19 @@ const Nanime = "https://anime.nicovideo.jp/period/now.html";
 const db = getFirestore();
 
 export const CheckStreaming = onSchedule(
-  {schedule: scheduleTime1, timeoutSeconds: 300},
+  {schedule: scheduleTime1, timeoutSeconds: 540},
   async () => {
     const before = new Date().getTime();
     // logger.info("Hello logs!", {structuredData: true});
 
-    // ChList DBの初期化
+    // ChListの更新ここから
     const channeldic = await getCh(Nanime);
 
     if (channeldic.season.endsWith(":error")) {
       return;
     }
     const dbConfig = db.collection("dbConfig");
-    const dbSeason = (await dbConfig.doc("NowSeason").get()).data();
+    const dbSeason = (await dbConfig.doc("nowSeason").get()).data();
     console.log(dbSeason);
     if (dbSeason != undefined) {
       if (dbSeason.data != channeldic.season) {
@@ -76,25 +76,14 @@ export const CheckStreaming = onSchedule(
           .set(document);
         console.log(res);
       }
-    }
-    const after = new Date().getTime();
-    console.log((after - before) / 1000);
-  }
-);
 
-export const updateViewCount = onSchedule(
-  {schedule: scheduleTime2, timeoutSeconds: 540},
-  async () => {
-    const dbConfig = db.collection("dbConfig");
-    const checkSeason = (await dbConfig.doc("nowSeason").get()).data();
-    const season = checkSeason != undefined ? checkSeason.data : "error";
+      // ChListの更新ここまで
 
-    if (season != "error") {
-      const SeasonCollection = season + "-ChList";
-      const channels = await getAllChList(SeasonCollection);
+      // videoごとの更新作業ここから
+      const channelArr = await getAllChList(channeldic.season);
 
-      for (let i = 0; i < channels.length; i++) {
-        const videoArr = await chVideos(channels[i]);
+      for (let i = 0; i < channelArr.length; i++) {
+        const videoArr = await chVideos(channelArr[i]);
         videoArr.forEach(async (video) => {
           const document = video.doc;
 
@@ -102,12 +91,20 @@ export const updateViewCount = onSchedule(
           const updateDay = new Date().getDate();
           const docId =
             video.id + "-" + String(updateMonth) + "-" + String(updateDay);
-          const res = await db.collection(season).doc(docId).set(document);
+          const res = await db
+            .collection(channeldic.season)
+            .doc(docId)
+            .set(document);
           console.log(res);
         });
       }
+      // videoごとの更新作業ここまで
     }
-    console.log("updateViewCount: end");
+    const mess = await calcAve();
+    if (mess == "end") {
+      const after = new Date().getTime();
+      console.log((after - before) / 1000);
+    }
   }
 );
 
@@ -116,4 +113,52 @@ const getAllChList = async (SeasonCollection: string) => {
   const RandChannels = GetDBchannels.docs.map((doc) => doc.id);
   const channels = RandChannels.sort();
   return channels;
+};
+
+const calcAve = async () => {
+  const dbConfig = db.collection("dbConfig");
+  const dbSeason = (await dbConfig.doc("nowSeason").get()).data();
+  if (dbSeason == undefined) {
+    return;
+  }
+  const season = dbSeason.data;
+
+  const chList = await getAllChList(season + "-ChList");
+
+  const channelLists: {
+    chId: string;
+    data: { comments: number; mylists: number; viewers: number };
+  }[] = [];
+  for (let i = 0; i < chList.length; i++) {
+    const getVideos = await db
+      .collection(season)
+      .where("chId", "==", chList[i])
+      .get();
+    let videoCount = 0;
+    let comments = 0;
+    let mylists = 0;
+    let viewers = 0;
+    getVideos.forEach((doc) => {
+      const data = doc.data();
+      comments += Number(data.NumComment);
+      mylists += Number(data.mylist);
+      viewers += Number(data.viewer);
+      videoCount++;
+    });
+    const aveComments = comments ? Math.trunc(comments / videoCount) : 0;
+    const aveMylists = mylists ? Math.trunc(mylists / videoCount) : 0;
+    const aveViewers = viewers ? Math.trunc(viewers / videoCount) : 0;
+
+    const res = await db
+      .collection(season + "-ChList")
+      .doc(chList[i])
+      .update({
+        aveComments: aveComments,
+        aveMylists: aveMylists,
+        aveViewers: aveViewers,
+      });
+    console.log(res);
+  }
+  console.log(channelLists);
+  return "end";
 };
