@@ -6,15 +6,15 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-import {initializeApp} from "firebase-admin/app";
+import { initializeApp } from "firebase-admin/app";
 initializeApp();
 
-// import { onRequest } from "firebase-functions/v2/https";
-import {onSchedule} from "firebase-functions/v2/scheduler";
+//import { onRequest } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
-import {getFirestore} from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 
-import {scheduleTime1} from "./scheduleTime";
+import { scheduleTime1 } from "./scheduleTime";
 import getCh from "./GetCh";
 import chVideos from "./chVideos";
 
@@ -26,7 +26,7 @@ const Nanime = "https://anime.nicovideo.jp/period/now.html";
 const db = getFirestore();
 
 export const CheckStreaming = onSchedule(
-  {schedule: scheduleTime1, timeoutSeconds: 540},
+  { schedule: scheduleTime1, timeoutSeconds: 540 },
   async () => {
     const before = new Date().getTime();
     // logger.info("Hello logs!", {structuredData: true});
@@ -100,6 +100,7 @@ export const CheckStreaming = onSchedule(
       }
       // videoごとの更新作業ここまで
     }
+
     const mess = await calcAve();
     if (mess == "end") {
       const after = new Date().getTime();
@@ -122,6 +123,10 @@ const calcAve = async () => {
     return;
   }
   const season = dbSeason.data;
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const JSTStartOfDay = startOfDay.getTime() - 9 * 60 * 60 * 1000 * 2;
+  console.log(JSTStartOfDay);
 
   const chList = await getAllChList(season + "-ChList");
 
@@ -132,6 +137,7 @@ const calcAve = async () => {
   for (let i = 0; i < chList.length; i++) {
     const getVideos = await db
       .collection(season)
+      .where("update", ">", JSTStartOfDay)
       .where("chId", "==", chList[i])
       .get();
     let videoCount = 0;
@@ -140,6 +146,7 @@ const calcAve = async () => {
     let viewers = 0;
     getVideos.forEach((doc) => {
       const data = doc.data();
+      console.log("docId:", doc.id);
       comments += Number(data.NumComment);
       mylists += Number(data.mylist);
       viewers += Number(data.viewer);
@@ -148,6 +155,11 @@ const calcAve = async () => {
     const aveComments = comments ? Math.trunc(comments / videoCount) : 0;
     const aveMylists = mylists ? Math.trunc(mylists / videoCount) : 0;
     const aveViewers = viewers ? Math.trunc(viewers / videoCount) : 0;
+
+    console.log("chId", chList[i]);
+    console.log("aveComments", aveComments);
+    console.log("aveMylists", aveMylists);
+    console.log("aveViewers", aveViewers);
 
     const res = await db
       .collection(season + "-ChList")
