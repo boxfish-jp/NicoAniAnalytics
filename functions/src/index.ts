@@ -80,7 +80,7 @@ export const CheckStreaming = onSchedule(
       // ChListの更新ここまで
 
       // videoごとの更新作業ここから
-      const channelArr = await getAllChList(channeldic.season);
+      const channelArr = await getAllChList(collectionName);
 
       for (let i = 0; i < channelArr.length; i++) {
         const videoArr = await chVideos(channelArr[i]);
