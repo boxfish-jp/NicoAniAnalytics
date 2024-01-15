@@ -32,6 +32,7 @@ const getCh = async (Nanime: string) => {
         document: {
           title: string;
           thumb: string;
+          NanimeDetail: string;
           chUrl: string;
           detail: string;
         };
@@ -54,23 +55,22 @@ const getCh = async (Nanime: string) => {
 
         const getChAvail = getTagArray("J9hxP", "div", "", parseElem);
 
-        console.log("title:", title, "thumb:", thumb);
-
         const getDetail = getTagArray("_bV14", "p", "", parseElem);
         const detail = getDetail[0];
-        console.log("detail:", detail);
 
         if (getChAvail[0]) {
           const getCh = getAttrArray("_2R1vQ", "a", "href", "", parseElem);
 
-          const chId = getCh[0].split("/")[2];
+          const NanimeDetail =
+            "https://anime.nicovideo.jp" + getCh[0].split("?from=")[0];
 
+          const chId = getCh[0].split("/")[2];
           const chUrl = "https://ch.nicovideo.jp/" + chId;
 
-          console.log("chUrl:", chUrl);
           const document = {
             title: title,
             thumb: thumb,
+            NanimeDetail: NanimeDetail,
             chUrl: chUrl,
             detail: detail,
           };

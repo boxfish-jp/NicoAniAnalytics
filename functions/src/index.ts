@@ -58,8 +58,12 @@ export const CheckStreaming = onSchedule(
       // ChList更新用データの取得ここまで
 
       // videoごとの更新作業ここから
+      let chListLength = 0;
       for (let i = 0; i < channels.length; i++) {
-        const videoArr = await chVideos(channels[i].chId); // スクレイピングした動画データ
+        const videoArr = await chVideos(
+          channels[i].chId,
+          channels[i].document.NanimeDetail
+        ); // スクレイピングした動画データ
         let sumComments = 0;
         let sumMylists = 0;
         let sumViewers = 0;
@@ -96,23 +100,38 @@ export const CheckStreaming = onSchedule(
 
         const videoIds = videoArr.map((video) => video.id);
 
-        const document = {
-          chUrl: channels[i].document.chUrl,
-          detail: channels[i].document.detail,
-          thumb: channels[i].document.thumb,
-          title: channels[i].document.title,
-          aveComments: aveComments,
-          aveMylists: aveMylists,
-          aveViewers: aveViewers,
-          videoIds: videoIds,
-        };
-        const res = await db
-          .collection(collectionName)
-          .doc(channels[i].chId)
-          .update(document);
-        console.log(res);
+        if (videoArr.length != 0) {
+          const newChId = videoArr[0].doc.chId;
+          if (newChId != channels[i].chId) {
+            await db.collection(collectionName).doc(channels[i].chId).delete();
+          }
+          const document = {
+            chUrl: "https://ch.nicovideo.jp/" + newChId,
+            detail: channels[i].document.detail,
+            thumb: channels[i].document.thumb,
+            title: channels[i].document.title,
+            aveComments: aveComments,
+            aveMylists: aveMylists,
+            aveViewers: aveViewers,
+            videoIds: videoIds,
+          };
+
+          const res = await db
+            .collection(collectionName)
+            .doc(newChId)
+            .set(document);
+          console.log(res);
+          chListLength++;
+        }
       }
       // videoごとの更新作業ここまで
+
+      // nowSeasonのチャンネル数を更新
+      const document = {
+        chNum: chListLength,
+      };
+      const res = await dbConfig.doc("nowSeason").update(document);
+      console.log(res);
     }
     // 実行後の時刻を取得
     const after = new Date().getTime();
