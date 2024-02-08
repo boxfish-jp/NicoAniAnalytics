@@ -1,6 +1,6 @@
 import Cheerio from "cheerio";
-import {getAttrArray, getTagArray} from "./scraping/getPage";
-import fetcher from "./scraping/fetcher";
+import { getAttrArray, getTagArray } from "./scraping/getPage";
+import fetcher from "./scraping/testFetcher";
 
 const errorMess = (message: string) => ({
   season: message + ":error",
@@ -35,9 +35,11 @@ const getCh = async (Nanime: string) => {
           NanimeDetail: string;
           chUrl: string;
           detail: string;
+          latestFree: boolean;
+          premium: boolean;
         };
       }[];
-    } = {season: season, channels: []};
+    } = { season: season, channels: [] };
 
     const $ = Cheerio.load(SeasonPage);
     $(".ynMe4").each((i, elem) => {
@@ -61,6 +63,14 @@ const getCh = async (Nanime: string) => {
         if (getChAvail[0]) {
           const getCh = getAttrArray("_2R1vQ", "a", "href", "", parseElem);
 
+          const getProvide = getTagArray("_2ZVYy", "li", "", parseElem);
+          const latestFree = getProvide.some((item) =>
+            item.includes("最新話無料")
+          );
+          const premium = getProvide.some((item) =>
+            item.includes("プレミアム会員 見放題")
+          );
+
           const NanimeDetail =
             "https://anime.nicovideo.jp" + getCh[0].split("?from=")[0];
 
@@ -73,9 +83,11 @@ const getCh = async (Nanime: string) => {
             NanimeDetail: NanimeDetail,
             chUrl: chUrl,
             detail: detail,
+            latestFree: latestFree,
+            premium: premium,
           };
 
-          channelDic.channels.push({chId: chId, document: document});
+          channelDic.channels.push({ chId: chId, document: document });
         }
       }
     });

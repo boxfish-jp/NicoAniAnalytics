@@ -6,15 +6,15 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-import {initializeApp} from "firebase-admin/app";
+import { initializeApp } from "firebase-admin/app";
 initializeApp();
 
 // import { onRequest } from "firebase-functions/v2/https";
-import {onSchedule} from "firebase-functions/v2/scheduler";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
-import {getFirestore} from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 
-import {scheduleTime1} from "./scheduleTime";
+import { scheduleTime1 } from "./scheduleTime";
 import getCh from "./GetCh";
 import chVideos from "./chVideos";
 
@@ -26,7 +26,7 @@ const Nanime = "https://anime.nicovideo.jp/period/now.html";
 const db = getFirestore();
 
 export const CheckStreaming = onSchedule(
-  {schedule: scheduleTime1, timeoutSeconds: 540},
+  { schedule: scheduleTime1, timeoutSeconds: 540 },
   async () => {
     // 実行前の時刻を取得
     const before = new Date().getTime();
@@ -88,15 +88,15 @@ export const CheckStreaming = onSchedule(
         });
 
         // ChListのデータをデータベースに保存
-        const aveComments = sumComments ?
-          Math.trunc(sumComments / videoArr.length) :
-          0;
-        const aveMylists = sumMylists ?
-          Math.trunc(sumMylists / videoArr.length) :
-          0;
-        const aveViewers = sumViewers ?
-          Math.trunc(sumViewers / videoArr.length) :
-          0;
+        const aveComments = sumComments
+          ? Math.trunc(sumComments / videoArr.length)
+          : 0;
+        const aveMylists = sumMylists
+          ? Math.trunc(sumMylists / videoArr.length)
+          : 0;
+        const aveViewers = sumViewers
+          ? Math.trunc(sumViewers / videoArr.length)
+          : 0;
 
         const videoIds = videoArr.map((video) => video.id);
 
@@ -110,6 +110,8 @@ export const CheckStreaming = onSchedule(
             detail: channels[i].document.detail,
             thumb: channels[i].document.thumb,
             title: channels[i].document.title,
+            latestFree: channels[i].document.latestFree,
+            premium: channels[i].document.premium,
             aveComments: aveComments,
             aveMylists: aveMylists,
             aveViewers: aveViewers,
