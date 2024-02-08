@@ -1,6 +1,6 @@
 import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
-import fetcher from "./scraping/testFetcher";
+import fetcher from "./scraping/fetcher";
 
 const errorMess = (message: string) => ({
   season: message + ":error",
