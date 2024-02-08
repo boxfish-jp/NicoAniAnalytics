@@ -1,6 +1,6 @@
 import fetcher from "./scraping/fetcher";
 import Cheerio from "cheerio";
-import {getAttrArray, getTagArray} from "./scraping/getPage";
+import { getAttrArray, getTagArray } from "./scraping/getPage";
 
 const chVideos = async (chId: string, NanimeDetail: string) => {
   const channelUrl = "https://ch.nicovideo.jp/" + chId + "/video";
@@ -59,6 +59,12 @@ const chVideos = async (chId: string, NanimeDetail: string) => {
 
       const getThumb = getAttrArray("", ".item_left img", "src", "", parseElem);
       const thumb = getThumb[0];
+
+      const getLength = getTagArray("", "span.br.badge.length", "", parseElem);
+      const lengthMin = getLength[0].split(":")[0];
+      if (Number(lengthMin) <= 1) {
+        return;
+      }
 
       const getDescription = getTagArray("description", "p", "", parseElem);
       const description = getDescription[0].trim();
