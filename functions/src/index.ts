@@ -17,6 +17,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { scheduleTime1 } from "./scheduleTime";
 import getCh from "./GetCh";
 import chVideos from "./chVideos";
+import getAnnict from "./annict/getAnnict";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -101,6 +102,7 @@ export const CheckStreaming = onSchedule(
         const videoIds = videoArr.map((video) => video.id);
 
         if (videoArr.length != 0) {
+          const AnnictData = await getAnnict(channels[i].document.title);
           const newChId = videoArr[0].doc.chId;
           if (newChId != channels[i].chId) {
             await db.collection(collectionName).doc(channels[i].chId).delete();
@@ -116,6 +118,10 @@ export const CheckStreaming = onSchedule(
             aveMylists: aveMylists,
             aveViewers: aveViewers,
             videoIds: videoIds,
+            twitter: AnnictData.twitter,
+            site: AnnictData.siteUrl,
+            casts: AnnictData.casts,
+            staffs: AnnictData.staffs,
           };
 
           const res = await db
