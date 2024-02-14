@@ -2,20 +2,19 @@ import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
 import fetcher from "./scraping/fetcher";
 
-const errorMess = (message: string) => ({
-  season: message + ":error",
-  channels: [],
-});
-
 const getCh = async (Nanime: string) => {
-  const SeasonPage = await fetcher(Nanime);
+  const lastFetch = 0;
+  const SeasonPage = await fetcher(Nanime, lastFetch);
 
+  if (SeasonPage.dom == "error") {
+    throw new Error("can't get seasonPage");
+  }
   const ogImage: string[] = getAttrArray(
     "",
     "meta[property='og:image']",
     "content",
     "",
-    SeasonPage
+    SeasonPage.dom
   );
 
   if (ogImage.length != 0) {
@@ -25,23 +24,16 @@ const getCh = async (Nanime: string) => {
 
     console.log(season);
 
-    const channelDic: {
-      season: string;
-      channels: {
-        chId: string;
-        document: {
-          title: string;
-          thumb: string;
-          NanimeDetail: string;
-          chUrl: string;
-          detail: string;
-          latestFree: boolean;
-          premium: boolean;
-        };
-      }[];
-    } = { season: season, channels: [] };
+    const channelArr: {
+      title: string;
+      thumb: string;
+      NanimeDetail: string;
+      detail: string;
+      latestFree: boolean;
+      premium: boolean;
+    }[] = [];
 
-    const $ = Cheerio.load(SeasonPage);
+    const $ = Cheerio.load(SeasonPage.dom);
     $(".ynMe4").each((i, elem) => {
       // カード一つ一つの処理をここに書く。
       // この中でデータを取る
@@ -61,7 +53,7 @@ const getCh = async (Nanime: string) => {
         const detail = getDetail[0];
 
         if (getChAvail[0]) {
-          const getCh = getAttrArray("_2R1vQ", "a", "href", "", parseElem);
+          const getNani = getAttrArray("_2R1vQ", "a", "href", "", parseElem);
 
           const getProvide = getTagArray("_2ZVYy", "li", "", parseElem);
           const latestFree = getProvide.some((item) =>
@@ -72,28 +64,27 @@ const getCh = async (Nanime: string) => {
           );
 
           const NanimeDetail =
-            "https://anime.nicovideo.jp" + getCh[0].split("?from=")[0];
-
-          const chId = getCh[0].split("/")[2];
-          const chUrl = "https://ch.nicovideo.jp/" + chId;
+            "https://anime.nicovideo.jp" + getNani[0].split("?from=")[0];
 
           const document = {
             title: title,
             thumb: thumb,
             NanimeDetail: NanimeDetail,
-            chUrl: chUrl,
             detail: detail,
             latestFree: latestFree,
             premium: premium,
           };
 
-          channelDic.channels.push({ chId: chId, document: document });
+          channelArr.push(document);
         }
       }
     });
-    return channelDic;
+    return {
+      channelDic: { season: season, channels: channelArr },
+      fetchDate: SeasonPage.fetchDate,
+    };
   } else {
-    return errorMess("seasonPage");
+    throw new Error("ogImage is empty");
   }
 };
 
