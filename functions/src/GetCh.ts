@@ -22,8 +22,6 @@ const getCh = async (Nanime: string) => {
       .split("https://anime.nicovideo.jp/assets/images/")[1]
       .split(".jpg")[0];
 
-    console.log(season);
-
     const channelArr: {
       title: string;
       thumb: string;
