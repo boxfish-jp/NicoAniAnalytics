@@ -7,6 +7,6 @@ describe("fetcher", () => {
     const date = new Date();
     const res = await fetcher(url, lastFetch);
     expect(res.dom).toMatch(/^<!doctype html>/);
-    expect(res.fetchDate).toBeGreaterThan(date.getTime() - 10);
+    expect(res.fetchTime).toBeGreaterThan(date.getTime() - 10);
   });
 });

@@ -1,20 +1,7 @@
-import getCh from "../src/GetCh";
+import getCh from "../src/getCh";
 const url = "https://anime.nicovideo.jp/period/now.html";
-type getChType = {
-  channelDic: {
-    season: string;
-    channels: {
-      title: string;
-      thumb: string;
-      NanimeDetail: string;
-      detail: string;
-      latestFree: boolean;
-      premium: boolean;
-    }[];
-  };
-  fetchDate: number;
-};
-let res: getChType;
+
+let res: Awaited<ReturnType<typeof getCh>>;
 beforeAll(async () => {
   res = await getCh(url);
 });

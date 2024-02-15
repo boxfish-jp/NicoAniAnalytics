@@ -77,7 +77,7 @@ const chVideos = async (chId: string, lastFetch: number) => {
     }
   });
 
-  return { videos: videos, fetchTime: channelPage.fetchDate };
+  return { videos: videos, fetchTime: channelPage.fetchTime };
 };
 
 export default chVideos;

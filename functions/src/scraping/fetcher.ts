@@ -7,10 +7,10 @@ const fetcher = async (url: string, lastFetch: number) => {
   try {
     const curl = await fetch(url);
     const page = await curl.text();
-    return { dom: page, fetchDate: now };
+    return { dom: page, fetchTime: now };
   } catch (error) {
     console.log("error:" + url + " :" + error);
-    return { dom: "error", fetchDate: now };
+    return { dom: "error", fetchTime: now };
   }
 };
 

@@ -15,17 +15,10 @@ const getDetail = async (url: string, lastFetch: number) => {
   for (url of getUrl) {
     if (!url.startsWith("https://ch.nicovideo.jp/search/")) {
       url = url.split("?")[0];
-      return { chUrl: url, fetchData: fetchData.fetchDate };
+      return { chUrl: url, fetchTime: fetchData.fetchTime };
     }
   }
-  return { chUrl: "", fetchData: fetchData.fetchDate };
+  return { chUrl: "", fetchTime: fetchData.fetchTime };
 };
 
 export default getDetail;
-
-const main = async () => {
-  const url = "https://anime.nicovideo.jp/detail/ao-ex/index.html";
-  await getDetail(url, 0);
-};
-
-main();

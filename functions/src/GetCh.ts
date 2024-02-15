@@ -79,7 +79,7 @@ const getCh = async (Nanime: string) => {
     });
     return {
       channelDic: { season: season, channels: channelArr },
-      fetchDate: SeasonPage.fetchDate,
+      fetchTime: SeasonPage.fetchTime,
     };
   } else {
     throw new Error("ogImage is empty");

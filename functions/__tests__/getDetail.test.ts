@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 describe("アニメの詳細情報の取得", () => {
   test("実行時に5秒待てるか", async () => {
-    expect(detail.fetchData).toBeGreaterThanOrEqual(time + 5000);
+    expect(detail.fetchTime).toBeGreaterThanOrEqual(time + 5000);
   }, 10000);
   test("chUrlが取得できるか", async () => {
     expect(detail.chUrl).toBe("https://ch.nicovideo.jp/ao-ex-shimane");
