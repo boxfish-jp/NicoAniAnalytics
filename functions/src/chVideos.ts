@@ -2,34 +2,11 @@ import fetcher from "./scraping/fetcher";
 import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
 
-const chVideos = async (chId: string, NanimeDetail: string) => {
+const chVideos = async (chId: string, lastFetch: number) => {
   const channelUrl = "https://ch.nicovideo.jp/" + chId + "/video";
-  let channelPage = await fetcher(channelUrl);
+  let channelPage = await fetcher(channelUrl, lastFetch);
 
-  let $ = Cheerio.load(channelPage);
-
-  if ($(".p-channelVideo__wrapper").length == 0) {
-    const NanimeDetailPage = await fetcher(NanimeDetail);
-    const getChid = getAttrArray(
-      "_26BSZ",
-      "a",
-      "href",
-      "https://ch.nicovideo.jp/",
-      NanimeDetailPage
-    );
-    if (getChid.length == 0) {
-      return [];
-    }
-    chId = getChid[0].split("/")[3].split("?")[0];
-    if (chId === "search") {
-      return [];
-    }
-    const newUrl = "https://ch.nicovideo.jp/" + chId + "/video";
-
-    channelPage = await fetcher(newUrl);
-
-    $ = Cheerio.load(channelPage);
-  }
+  const $ = Cheerio.load(channelPage.dom);
 
   const videos: {
     id: string;
@@ -100,7 +77,7 @@ const chVideos = async (chId: string, NanimeDetail: string) => {
     }
   });
 
-  return videos;
+  return { videos: videos, fetchTime: channelPage.fetchDate };
 };
 
 export default chVideos;
