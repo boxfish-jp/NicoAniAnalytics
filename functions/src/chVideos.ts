@@ -4,7 +4,7 @@ import { getAttrArray, getTagArray } from "./scraping/getPage";
 
 const chVideos = async (chId: string, lastFetch: number) => {
   const channelUrl = "https://ch.nicovideo.jp/" + chId + "/video";
-  let channelPage = await fetcher(channelUrl, lastFetch);
+  const channelPage = await fetcher(channelUrl, lastFetch);
 
   const $ = Cheerio.load(channelPage.dom);
 
