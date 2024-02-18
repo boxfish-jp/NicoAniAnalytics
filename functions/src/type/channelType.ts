@@ -1,4 +1,4 @@
-import getCh from "../getCh";
+import getChannels from "../getChannels";
 
-export type GetChReturnType = Awaited<ReturnType<typeof getCh>>;
-export type ChannelsType = GetChReturnType["channelDic"]["channels"][0];
+export type getChannelsReturnType = Awaited<ReturnType<typeof getChannels>>;
+export type ChannelsType = getChannelsReturnType["channelDic"]["channels"][0];

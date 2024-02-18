@@ -2,7 +2,7 @@ import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
 import fetcher from "./scraping/fetcher";
 
-const getCh = async (Nanime: string) => {
+const getChannels = async (Nanime: string) => {
   const lastFetch = 0;
   const SeasonPage = await fetcher(Nanime, lastFetch);
 
@@ -45,12 +45,12 @@ const getCh = async (Nanime: string) => {
         const thumb =
           "https://anime.nicovideo.jp" + getThumb[0].replace("_S", "_L");
 
-        const getChAvail = getTagArray("J9hxP", "div", "", parseElem);
+        const getChannelsAvail = getTagArray("J9hxP", "div", "", parseElem);
 
         const getDetail = getTagArray("_bV14", "p", "", parseElem);
         const detail = getDetail[0];
 
-        if (getChAvail[0]) {
+        if (getChannelsAvail[0]) {
           const getNani = getAttrArray("_2R1vQ", "a", "href", "", parseElem);
 
           const getProvide = getTagArray("_2ZVYy", "li", "", parseElem);
@@ -86,4 +86,4 @@ const getCh = async (Nanime: string) => {
   }
 };
 
-export default getCh;
+export default getChannels;

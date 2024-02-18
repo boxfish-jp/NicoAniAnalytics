@@ -15,7 +15,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { getFirestore } from "firebase-admin/firestore";
 
 import { scheduleTime1 } from "./scheduleTime";
-import getCh from "./getCh";
+import getChannels from "./getChannels";
 import getDetail from "./getDetail";
 import chVideos from "./chVideos";
 import makeDBData from "./makeData";
@@ -35,8 +35,8 @@ export const CheckStreaming = onSchedule(
     // logger.info("Hello logs!", {structuredData: true});
 
     // ChList更新用データの取得ここから
-    const getChData = await getCh(Nanime);
-    const channeldic = getChData.channelDic;
+    const getChannelsData = await getChannels(Nanime);
+    const channeldic = getChannelsData.channelDic;
 
     const dbConfig = db.collection("dbConfig");
     const dbSeason = (await dbConfig.doc("nowSeason").get()).data();
@@ -53,7 +53,7 @@ export const CheckStreaming = onSchedule(
       const collectionName = channeldic.season + "-ChList"; // ChListのコレクション名
       // const collectionName = dbSeason.data + "-ChList";
 
-      let lastFetch = getChData.fetchTime;
+      let lastFetch = getChannelsData.fetchTime;
       let chListLength = 0;
       for (const channel of channeldic.channels) {
         const aniId = channel.NanimeDetail.replace(
@@ -68,9 +68,9 @@ export const CheckStreaming = onSchedule(
 
         let chUrl = "";
         if (!getdbChData.exists || getdbChData.data()?.chUrl != "") {
-          const getChUrl = await getDetail(channel.NanimeDetail, lastFetch);
-          lastFetch = getChUrl.fetchTime;
-          chUrl = getChUrl.chUrl;
+          const getChannelsUrl = await getDetail(channel.NanimeDetail, lastFetch);
+          lastFetch = getChannelsUrl.fetchTime;
+          chUrl = getChannelsUrl.chUrl;
         } else {
           chUrl = getdbChData.data()?.chUrl;
         }

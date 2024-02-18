@@ -1,9 +1,9 @@
-import getCh from "../src/getCh";
+import getChannels from "../src/getChannels";
 const url = "https://anime.nicovideo.jp/period/now.html";
 
-let res: Awaited<ReturnType<typeof getCh>>;
+let res: Awaited<ReturnType<typeof getChannels>>;
 beforeAll(async () => {
-  res = await getCh(url);
+  res = await getChannels(url);
 });
 
 describe("アニメリストの取得", () => {
