@@ -46,9 +46,7 @@ describe("getDbCh", () => {
   });
   test("site", () => {
     if (dbChDataCollect != undefined) {
-      expect(dbChDataCollect.site).toBe(
-        "https://delicious-in-dungeon.com/theater.html"
-      );
+      expect(dbChDataCollect.site).toBe("https://delicious-in-dungeon.com/");
     }
   });
   test("thumb", () => {
