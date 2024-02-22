@@ -18,11 +18,6 @@ const makeDBData = async (
     sumMylists += Number(video.doc.mylist);
     sumViewers += Number(video.doc.viewer);
 
-    // videoIdを日付付きで更新
-    const updateMonth = new Date().getMonth();
-    const updateDay = new Date().getDate();
-    video.id = video.id + "-" + String(updateMonth) + "-" + String(updateDay);
-
     videoData.push(video);
   });
 
