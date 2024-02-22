@@ -9,7 +9,7 @@ if (!getApps().length) {
     projectId: "nicoanimeanalytics",
     credential: cert(
       // 環境変数から認証情報を取得
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string)
+      JSON.parse(process.env.FB_SERVICE_ACCOUNT_KEY as string)
     ),
   });
 }
