@@ -18,6 +18,7 @@ import getDetail from "./getDetail";
 import chVideos from "./chVideos";
 import makeDBData from "./makeData";
 import registerDb from "./db/registerDb";
+import updateDb from "./db/updateDb";
 import getDbSeason from "./db/getDbSeason";
 import getDbCh from "./db/getDbCh";
 
@@ -61,12 +62,12 @@ export const CheckStreaming = onSchedule(
       const getdbChData = await getDbCh(collectionName, aniId);
 
       let chUrl = "";
-      if (getdbChData == undefined || getdbChData?.chUrl != "") {
+      if (getdbChData == undefined || getdbChData?.chUrl == "") {
         const getChannelsUrl = await getDetail(channel.NanimeDetail, lastFetch);
         lastFetch = getChannelsUrl.fetchTime;
         chUrl = getChannelsUrl.chUrl;
       } else {
-        chUrl = getdbChData.data()?.chUrl;
+        chUrl = getdbChData.chUrl;
       }
 
       const chId = chUrl.split("https://ch.nicovideo.jp/")[1];
@@ -95,9 +96,9 @@ export const CheckStreaming = onSchedule(
     }
     // nowSeasonのチャンネル数を更新
     const document = {
-      chNum: chListLength,
+      numCh: chListLength,
     };
-    const res = await registerDb("dbConfig", "nowSeason", document);
+    const res = await updateDb("dbConfig", "nowSeason", document);
     console.log(res);
     // 実行後の時刻を取得
     const after = new Date().getTime();
