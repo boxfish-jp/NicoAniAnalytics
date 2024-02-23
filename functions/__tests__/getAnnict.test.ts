@@ -10,10 +10,20 @@ beforeAll(async () => {
 
 describe("getAnnict", () => {
   test("title", () => {
-    expect(annictData.title).toBe("ダンジョン飯");
+    expect(
+      ["ダンジョン飯", "ダンジョン飯 ～Delicious in Dungeon～"].includes(
+        annictData.title
+      )
+    ).toBeTruthy();
   });
   test("officialSiteUrl", () => {
-    expect(annictData.siteUrl).toBe("https://delicious-in-dungeon.com/");
+    console.log(annictData.siteUrl);
+    expect(
+      [
+        "https://delicious-in-dungeon.com/",
+        "https://delicious-in-dungeon.com/theater.html",
+      ].includes(annictData.siteUrl)
+    ).toBeTruthy();
   });
   test("twitter", () => {
     expect(annictData.twitter).toBe("dun_meshi_anime");

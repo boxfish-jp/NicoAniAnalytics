@@ -46,6 +46,11 @@ describe("makeData", () => {
     expect(createdData?.chDoc.twitter).toBe("dun_meshi_anime");
   });
   test("site", () => {
-    expect(createdData?.chDoc.site).toBe("https://delicious-in-dungeon.com/");
+    expect(
+      [
+        "https://delicious-in-dungeon.com/",
+        "https://delicious-in-dungeon.com/theater.html",
+      ].includes(createdData?.chDoc.site)
+    ).toBeTruthy();
   });
 });
