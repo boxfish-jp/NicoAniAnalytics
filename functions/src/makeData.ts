@@ -18,6 +18,10 @@ const makeDBData = async (
     sumMylists += Number(video.doc.mylist);
     sumViewers += Number(video.doc.viewer);
 
+    // videoIdを日付付きで更新
+    const updateMonth = new Date().getMonth();
+    const updateDay = new Date().getDate();
+    video.id = video.id + "-" + String(updateMonth) + "-" + String(updateDay);
     videoData.push(video);
   });
 
@@ -28,7 +32,9 @@ const makeDBData = async (
   const aveMylists = sumMylists ? Math.trunc(sumMylists / videoArr.length) : 0;
   const aveViewers = sumViewers ? Math.trunc(sumViewers / videoArr.length) : 0;
 
-  const videoIds = videoArr.map((video) => video.id);
+  const videoIds = videoArr.map((video) =>
+    video.doc.url.replace("https://www.nicovideo.jp/watch/", "")
+  );
 
   if (videoArr.length != 0) {
     const docId = channel.NanimeDetail.split("/")[4];
