@@ -16,11 +16,10 @@ import { scheduleTime1 } from "./scheduleTime";
 import getChannels from "./getChannels";
 import getDetail from "./getDetail";
 import chVideos from "./chVideos";
-import makeDBData from "./makeData";
-import registerDb from "./db/registerDb";
-import updateDb from "./db/updateDb";
-import getDbSeason from "./db/getDbSeason";
-import getDbCh from "./db/getDbCh";
+import { getDbSeason, createSeason } from "./db/season";
+import { getDbChlistFromTag, createChlist } from "./db/chlist";
+import { createVideos, getDbVideosFromId } from "./db/videos";
+import getAnnict from "./annict/getAnnict";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -38,68 +37,80 @@ export const CheckStreaming = onSchedule(
     const getChannelsData = await getChannels(Nanime);
     const channeldic = getChannelsData.channelDic;
 
-    const dbSeason = await getDbSeason();
-    if (dbSeason != channeldic.season) {
-      // シーズンが変わったらnowSeasonを更新
-      const document = {
-        data: channeldic.season,
-      };
-      const res = await registerDb("dbConfig", "nowSeason", document);
-      console.log(res);
+    const dbSeason = await getDbSeason(
+      channeldic.season.syear,
+      channeldic.season.sseason
+    );
+    if (dbSeason.length == 0) {
+      await createSeason(channeldic.season.syear, channeldic.season.sseason);
     }
 
-    const collectionName = channeldic.season + "-ChList"; // ChListのコレクション名
-    // const collectionName = dbSeason + "-ChList";
-
     let lastFetch = getChannelsData.fetchTime;
-    let chListLength = 0;
+    //let chListLength = 0;
     for (const channel of channeldic.channels) {
-      const aniId = channel.NanimeDetail.replace(
+      // chlistの更新ここから
+      const NaniTag = channel.NanimeDetail.replace(
         /https:\/\/anime\.nicovideo\.jp\/detail\/(.*?)\/index\.html/,
         "$1"
       );
 
-      const getdbChData = await getDbCh(collectionName, aniId);
+      const getdbChData = await getDbChlistFromTag(NaniTag);
 
       let chUrl = "";
-      if (getdbChData == undefined || getdbChData?.chUrl == "") {
+      if (getdbChData.length == 0 || getdbChData[0].ch_url == "") {
         const getChannelsUrl = await getDetail(channel.NanimeDetail, lastFetch);
         lastFetch = getChannelsUrl.fetchTime;
         chUrl = getChannelsUrl.chUrl;
       } else {
-        chUrl = getdbChData.chUrl;
+        chUrl = getdbChData[0].ch_url;
       }
+      if (chUrl == "") {
+        continue;
+      }
+      const chsiteInfo = await getAnnict(channel.title);
+      // chlistの更新ここまで
 
-      const chId = chUrl.split("https://ch.nicovideo.jp/")[1];
-      const getVideoArr = await chVideos(chId, lastFetch);
+      const getVideoArr = await chVideos(chUrl, lastFetch);
       const videoArr = getVideoArr.videos;
       lastFetch = getVideoArr.fetchTime;
-
-      const createdData = await makeDBData(channel, chUrl, videoArr);
-
-      if (createdData != undefined) {
-        createdData.videos.forEach(async (video) => {
-          const res = await registerDb(channeldic.season, video.id, video.doc);
-          console.log(res);
-        });
-
-        const res = await registerDb(
-          collectionName,
-          createdData.chDocId,
-          createdData.chDoc
-        );
-        console.log(res);
-
-        await registerDb("dbConfig", "LastFetch", { data: lastFetch });
-        chListLength++;
+      if (videoArr.length == 0) {
+        continue;
       }
+      videoArr.forEach(async (video) => {
+        const res = await getDbVideosFromId(video.video.ch_seq_id);
+        if (res.length == 0) {
+          await createVideos(
+            video.video.ch_id,
+            video.video.ch_seq,
+            video.video.ch_seq_url,
+            video.video.ch_seq_id,
+            video.video.ch_seq_title,
+            video.video.ch_seq_thumb,
+            video.video.ch_seq_desc,
+            video.video.ch_seq_posted
+          );
+        }
+      });
+
+      if (getdbChData.length == 0) {
+        await createChlist(
+          videoArr[0].video.ch_id,
+          NaniTag,
+          channel.title,
+          chUrl,
+          channel.detail,
+          channel.latestFree ? 1 : 0,
+          channel.premium ? 1 : 0,
+          channeldic.season.syear,
+          channeldic.season.sseason,
+          chsiteInfo.twitter,
+          chsiteInfo.siteUrl,
+          channel.thumb
+        );
+      }
+      //await registerDb("dbConfig", "LastFetch", { data: lastFetch });
+      //chListLength++;
     }
-    // nowSeasonのチャンネル数を更新
-    const document = {
-      numCh: chListLength,
-    };
-    const res = await updateDb("dbConfig", "nowSeason", document);
-    console.log(res);
     // 実行後の時刻を取得
     const after = new Date().getTime();
     // 実行時間を計算
@@ -107,3 +118,98 @@ export const CheckStreaming = onSchedule(
     console.log("実行時間：" + executionTime + "ms");
   }
 );
+
+const test = async () => {
+  // 実行前の時刻を取得
+  const before = new Date().getTime();
+  // logger.info("Hello logs!", {structuredData: true});
+
+  // ChList更新用データの取得ここから
+  const getChannelsData = await getChannels(Nanime);
+  const channeldic = getChannelsData.channelDic;
+
+  const dbSeason = await getDbSeason(
+    channeldic.season.syear,
+    channeldic.season.sseason
+  );
+  if (dbSeason.length == 0) {
+    await createSeason(channeldic.season.syear, channeldic.season.sseason);
+  }
+
+  let lastFetch = getChannelsData.fetchTime;
+  //let chListLength = 0;
+  for (const channel of channeldic.channels) {
+    // chlistの更新ここから
+    const NaniTag = channel.NanimeDetail.replace(
+      /https:\/\/anime\.nicovideo\.jp\/detail\/(.*?)\/index\.html/,
+      "$1"
+    );
+
+    const getdbChData = await getDbChlistFromTag(NaniTag);
+
+    let chUrl = "";
+    let siteUrl = "";
+    if (getdbChData.length == 0 || getdbChData[0].ch_url == "") {
+      const getChannelsUrl = await getDetail(channel.NanimeDetail, lastFetch);
+      lastFetch = getChannelsUrl.fetchTime;
+      chUrl = getChannelsUrl.chUrl;
+      siteUrl = getChannelsUrl.siteUrl;
+    } else {
+      chUrl = getdbChData[0].ch_url;
+      siteUrl = getdbChData[0].ch_site;
+    }
+    if (chUrl == "") {
+      continue;
+    }
+    // const chsiteInfo = await getAnnict(channel.title);
+    // chlistの更新ここまで
+
+    const getVideoArr = await chVideos(chUrl, lastFetch);
+    const videoArr = getVideoArr.videos;
+    lastFetch = getVideoArr.fetchTime;
+    if (videoArr.length == 0) {
+      continue;
+    }
+    videoArr.forEach(async (video) => {
+      const res = await getDbVideosFromId(video.video.ch_seq_id);
+      if (res.length == 0) {
+        await createVideos(
+          video.video.ch_id,
+          video.video.ch_seq,
+          video.video.ch_seq_url,
+          video.video.ch_seq_id,
+          video.video.ch_seq_title,
+          video.video.ch_seq_thumb,
+          video.video.ch_seq_desc,
+          video.video.ch_seq_posted
+        );
+      }
+    });
+
+    if (getdbChData.length == 0) {
+      await createChlist(
+        videoArr[0].video.ch_id,
+        NaniTag,
+        channel.title,
+        chUrl,
+        channel.detail,
+        channel.latestFree ? 1 : 0,
+        channel.premium ? 1 : 0,
+        channeldic.season.syear,
+        channeldic.season.sseason,
+        "undefined",
+        siteUrl,
+        channel.thumb
+      );
+    }
+    //await registerDb("dbConfig", "LastFetch", { data: lastFetch });
+    //chListLength++;
+  }
+  // 実行後の時刻を取得
+  const after = new Date().getTime();
+  // 実行時間を計算
+  const executionTime = after - before;
+  console.log("実行時間：" + executionTime + "ms");
+};
+
+test();

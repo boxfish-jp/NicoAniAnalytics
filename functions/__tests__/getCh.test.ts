@@ -8,7 +8,8 @@ beforeAll(async () => {
 
 describe("アニメリストの取得", () => {
   test("seasonの取得", async () => {
-    expect(res.channelDic.season).toBe("2024-winter");
+    expect(res.channelDic.season.syear).toBe(2024);
+    expect(res.channelDic.season.sseason).toBe(1);
   });
   test("リストの長さ", async () => {
     expect(res.channelDic.channels.length).toBeGreaterThan(49);

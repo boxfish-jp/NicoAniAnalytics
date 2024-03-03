@@ -1,6 +1,7 @@
 import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
 import fetcher from "./scraping/fetcher";
+import parseSeason from "./parseSeason";
 
 const getChannels = async (Nanime: string) => {
   const lastFetch = 0;
@@ -18,10 +19,14 @@ const getChannels = async (Nanime: string) => {
   );
 
   if (ogImage.length != 0) {
-    const season = ogImage[0]
+    const seasonData = ogImage[0]
       .split("https://anime.nicovideo.jp/assets/images/")[1]
       .split(".jpg")[0];
 
+    const season = parseSeason(seasonData);
+    if (season == "error") {
+      throw new Error("can't parse season");
+    }
     const channelArr: {
       title: string;
       thumb: string;

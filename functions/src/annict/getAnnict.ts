@@ -19,8 +19,14 @@ const getAnnict = async (title: string) => {
   if (works.length != 0) {
     const work = works[0].node;
     const title = work.title;
-    const siteUrl = work.officialSiteUrl;
-    const twitter = work.twitterUsername;
+    let siteUrl = work.officialSiteUrl;
+    let twitter = work.twitterUsername;
+    if (siteUrl == undefined || siteUrl == "") {
+      siteUrl = "undefined";
+    }
+    if (twitter == undefined || twitter == "") {
+      twitter = "undefined";
+    }
     return {
       title: title,
       siteUrl: siteUrl,

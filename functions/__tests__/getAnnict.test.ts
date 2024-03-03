@@ -17,7 +17,6 @@ describe("getAnnict", () => {
     ).toBeTruthy();
   });
   test("officialSiteUrl", () => {
-    console.log(annictData.siteUrl);
     expect(
       [
         "https://delicious-in-dungeon.com/",
