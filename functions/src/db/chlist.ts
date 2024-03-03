@@ -1,11 +1,8 @@
 import dbFetcher from "./dbFetcher";
 import { dbEndpoint } from "./dbEndpoint";
 
-const getDbChlistFromTag = async (tag: string) => {
-  const url = dbEndpoint + "/chlist?ch_NaniTag=" + tag;
-  console.log(url);
-  const res = await dbFetcher(url);
-  const data = (await res.json()) as {
+const chlistParsed = async (res: Response) => {
+  return (await res.json()) as {
     result: {
       chlist_id: number;
       caddtime: string;
@@ -23,9 +20,24 @@ const getDbChlistFromTag = async (tag: string) => {
       ch_thumb: string;
     }[];
   };
+};
+
+const getDbChlistFromTag = async (tag: string) => {
+  const url = dbEndpoint + "/chlist?ch_NaniTag=" + tag;
+  console.log(url);
+  const res = await dbFetcher(url);
+  const data = await chlistParsed(res);
   if (data.result.length > 1) {
     throw new Error("nAniTag is not unique");
   }
+  return data.result;
+};
+
+const getDbChlistFromSeason = async (syear: number, sseason: number) => {
+  const url = dbEndpoint + "/chlist?syear=" + syear + "&sseason=" + sseason;
+  console.log(url);
+  const res = await dbFetcher(url);
+  const data = await chlistParsed(res);
   return data.result;
 };
 
@@ -77,4 +89,4 @@ const createChlist = async (
   }
 };
 
-export { getDbChlistFromTag, createChlist };
+export { getDbChlistFromTag, getDbChlistFromSeason, createChlist };

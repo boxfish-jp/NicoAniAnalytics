@@ -17,8 +17,13 @@ import getChannels from "./getChannels";
 import getDetail from "./getDetail";
 import chVideos from "./chVideos";
 import { getDbSeason, createSeason } from "./db/season";
-import { getDbChlistFromTag, createChlist } from "./db/chlist";
+import {
+  getDbChlistFromTag,
+  getDbChlistFromSeason,
+  createChlist,
+} from "./db/chlist";
 import { createVideos, getDbVideosFromId } from "./db/videos";
+import { getViewDatafromTime, createViewData } from "./db/viewData";
 import getAnnict from "./annict/getAnnict";
 
 // Start writing functions
@@ -77,6 +82,7 @@ export const CheckStreaming = onSchedule(
         continue;
       }
       videoArr.forEach(async (video) => {
+        // videosのDB登録作業
         const res = await getDbVideosFromId(video.video.ch_seq_id);
         if (res.length == 0) {
           await createVideos(
@@ -90,6 +96,39 @@ export const CheckStreaming = onSchedule(
             video.video.ch_seq_posted
           );
         }
+        // videosのDB登録作業
+
+        // viewDataのDB登録作業
+        const getDbLatestViewData = await getViewDatafromTime(
+          video.video.ch_seq_id,
+          new Date()
+        );
+        const lastViewData = {
+          view_amount:
+            getDbLatestViewData.length != 0
+              ? getDbLatestViewData[0].view_amount
+              : 0,
+          comment_amount:
+            getDbLatestViewData.length != 0
+              ? getDbLatestViewData[0].comment_amount
+              : 0,
+          mylist_amount:
+            getDbLatestViewData.length != 0
+              ? getDbLatestViewData[0].mylist_amount
+              : 0,
+        };
+        await createViewData(
+          video.video.ch_id,
+          video.video.ch_seq,
+          video.video.ch_seq_id,
+          video.viewData.viewer,
+          video.viewData.NumComment,
+          video.viewData.mylist,
+          video.viewData.viewer - lastViewData.view_amount,
+          video.viewData.NumComment - lastViewData.comment_amount,
+          video.viewData.mylist - lastViewData.mylist_amount
+        );
+        // viewDataのDB登録作業
       });
 
       if (getdbChData.length == 0) {
@@ -108,6 +147,7 @@ export const CheckStreaming = onSchedule(
           channel.thumb
         );
       }
+
       //await registerDb("dbConfig", "LastFetch", { data: lastFetch });
       //chListLength++;
     }
@@ -148,20 +188,17 @@ const test = async () => {
     const getdbChData = await getDbChlistFromTag(NaniTag);
 
     let chUrl = "";
-    let siteUrl = "";
     if (getdbChData.length == 0 || getdbChData[0].ch_url == "") {
       const getChannelsUrl = await getDetail(channel.NanimeDetail, lastFetch);
       lastFetch = getChannelsUrl.fetchTime;
       chUrl = getChannelsUrl.chUrl;
-      siteUrl = getChannelsUrl.siteUrl;
     } else {
       chUrl = getdbChData[0].ch_url;
-      siteUrl = getdbChData[0].ch_site;
     }
     if (chUrl == "") {
       continue;
     }
-    // const chsiteInfo = await getAnnict(channel.title);
+    const chsiteInfo = await getAnnict(channel.title);
     // chlistの更新ここまで
 
     const getVideoArr = await chVideos(chUrl, lastFetch);
@@ -171,6 +208,7 @@ const test = async () => {
       continue;
     }
     videoArr.forEach(async (video) => {
+      // videosのDB登録作業
       const res = await getDbVideosFromId(video.video.ch_seq_id);
       if (res.length == 0) {
         await createVideos(
@@ -184,6 +222,38 @@ const test = async () => {
           video.video.ch_seq_posted
         );
       }
+      // videosのDB登録作業
+
+      // viewDataのDB登録作業
+      const getDbLatestViewData = await getViewDatafromTime(
+        video.video.ch_seq_id,
+        new Date()
+      );
+      const lastViewData = {
+        view_amount:
+          getDbLatestViewData.length != 0
+            ? getDbLatestViewData[0].view_amount
+            : 0,
+        comment_amount:
+          getDbLatestViewData.length != 0
+            ? getDbLatestViewData[0].comment_amount
+            : 0,
+        mylist_amount:
+          getDbLatestViewData.length != 0
+            ? getDbLatestViewData[0].mylist_amount
+            : 0,
+      };
+      await createViewData(
+        video.video.ch_id,
+        video.video.ch_seq,
+        video.video.ch_seq_id,
+        video.viewData.viewer,
+        video.viewData.NumComment,
+        video.viewData.mylist,
+        video.viewData.viewer - lastViewData.view_amount,
+        video.viewData.NumComment - lastViewData.comment_amount,
+        video.viewData.mylist - lastViewData.mylist_amount
+      );
     });
 
     if (getdbChData.length == 0) {
@@ -197,11 +267,12 @@ const test = async () => {
         channel.premium ? 1 : 0,
         channeldic.season.syear,
         channeldic.season.sseason,
-        "undefined",
-        siteUrl,
+        chsiteInfo.twitter,
+        chsiteInfo.siteUrl,
         channel.thumb
       );
     }
+
     //await registerDb("dbConfig", "LastFetch", { data: lastFetch });
     //chListLength++;
   }
