@@ -1,11 +1,8 @@
 import { dbEndpoint } from "./dbEndpoint";
 import dbFetcher from "./dbFetcher";
 
-const getDbVideosFromId = async (ch_seq_id: number) => {
-  const url = dbEndpoint + "/videos?ch_seq_id=" + ch_seq_id;
-  console.log(url);
-  const res = await dbFetcher(url);
-  const data = (await res.json()) as {
+const videosParse = async (res: Response) => {
+  return (await res.json()) as {
     result: {
       video_id: number;
       vaddtime: string;
@@ -19,9 +16,24 @@ const getDbVideosFromId = async (ch_seq_id: number) => {
       ch_seq_posted: string;
     }[];
   };
+};
+
+const getDbVideosFromId = async (ch_seq_id: number) => {
+  const url = dbEndpoint + "/videos?ch_seq_id=" + ch_seq_id;
+  console.log(url);
+  const res = await dbFetcher(url);
+  const data = await videosParse(res);
   if (data.result.length > 1) {
     throw new Error("ch_seq_url is not unique");
   }
+  return data.result;
+};
+
+const getDbVideosFromCh = async (ch_id: number) => {
+  const url = dbEndpoint + "/videos?ch_id=" + ch_id;
+  console.log(url);
+  const res = await dbFetcher(url);
+  const data = await videosParse(res);
   return data.result;
 };
 
@@ -62,4 +74,4 @@ const createVideos = async (
   }
 };
 
-export { getDbVideosFromId, createVideos };
+export { getDbVideosFromId, getDbVideosFromCh, createVideos };

@@ -22,8 +22,13 @@ import {
   getDbChlistFromSeason,
   createChlist,
 } from "./db/chlist";
-import { createVideos, getDbVideosFromId } from "./db/videos";
+import {
+  createVideos,
+  getDbVideosFromCh,
+  getDbVideosFromId,
+} from "./db/videos";
 import { getViewDatafromTime, createViewData } from "./db/viewData";
+import { getRanking, createRanking } from "./db/ranking";
 import getAnnict from "./annict/getAnnict";
 
 // Start writing functions
@@ -276,6 +281,111 @@ const test = async () => {
     //await registerDb("dbConfig", "LastFetch", { data: lastFetch });
     //chListLength++;
   }
+
+  const chlists = await getDbChlistFromSeason(2024, 1);
+
+  const chdata: {
+    ch_id: number;
+    r_current_seq: number;
+    r_total_view: number;
+    r_total_comment: number;
+    r_total_mylist: number;
+    r_ave_view: number;
+    r_ave_comment: number;
+    r_ave_mylist: number;
+    r_ave_view_rank: number;
+    r_ave_comment_rank: number;
+    r_ave_mylist_rank: number;
+    r_diff_view: number;
+    r_diff_comment: number;
+    r_diff_mylist: number;
+  }[] = [];
+  for (const channel of chlists) {
+    const videos = await getDbVideosFromCh(channel.ch_id);
+
+    let total_View = 0;
+    let total_comment = 0;
+    let total_mylist = 0;
+    let current_seq = 0;
+    for (const video of videos) {
+      const viewData = await getViewDatafromTime(video.ch_seq_id, new Date());
+      for (const view of viewData) {
+        total_View += view.view_amount;
+        total_comment += view.comment_amount;
+        total_mylist += view.mylist_amount;
+      }
+      if (current_seq < video.ch_seq) {
+        current_seq = video.ch_seq;
+      }
+    }
+
+    const lastRanking = await getRanking(channel.ch_id, new Date());
+
+    chdata.push({
+      ch_id: channel.ch_id,
+      r_current_seq: current_seq,
+      r_total_view: total_View,
+      r_total_comment: total_comment,
+      r_total_mylist: total_mylist,
+      r_ave_view: Math.round(total_View / videos.length),
+      r_ave_comment: Math.round(total_comment / videos.length),
+      r_ave_mylist: Math.round(total_mylist / videos.length),
+      r_ave_view_rank: 0,
+      r_ave_comment_rank: 0,
+      r_ave_mylist_rank: 0,
+      r_diff_view:
+        lastRanking.length != 0
+          ? total_View - lastRanking[0].r_total_view
+          : total_View,
+      r_diff_comment:
+        lastRanking.length != 0
+          ? total_comment - lastRanking[0].r_total_comment
+          : total_comment,
+      r_diff_mylist:
+        lastRanking.length != 0
+          ? total_mylist - lastRanking[0].r_total_mylist
+          : total_mylist,
+    });
+  }
+
+  const sortView = [...chdata].sort((a, b) => {
+    return b.r_ave_view - a.r_ave_view;
+  });
+  const sortComment = [...chdata].sort((a, b) => {
+    return b.r_ave_comment - a.r_ave_comment;
+  });
+  const sortMylist = [...chdata].sort((a, b) => {
+    return b.r_ave_mylist - a.r_ave_mylist;
+  });
+
+  for (let i = 0; i < chdata.length; i++) {
+    chdata[i].r_ave_view_rank =
+      sortView.findIndex((value) => value.ch_id == chdata[i].ch_id) + 1;
+    chdata[i].r_ave_comment_rank =
+      sortComment.findIndex((value) => value.ch_id == chdata[i].ch_id) + 1;
+    chdata[i].r_ave_mylist_rank =
+      sortMylist.findIndex((value) => value.ch_id == chdata[i].ch_id) + 1;
+  }
+
+  chdata.forEach(async (data) => {
+    await createRanking(
+      data.ch_id,
+      data.r_current_seq,
+      data.r_total_view,
+      data.r_total_comment,
+      data.r_total_mylist,
+      data.r_ave_view,
+      data.r_ave_comment,
+      data.r_ave_mylist,
+      data.r_ave_view_rank,
+      data.r_ave_comment_rank,
+      data.r_ave_mylist_rank,
+      data.r_diff_view,
+      data.r_diff_comment,
+      data.r_diff_mylist
+    );
+  });
+
   // 実行後の時刻を取得
   const after = new Date().getTime();
   // 実行時間を計算

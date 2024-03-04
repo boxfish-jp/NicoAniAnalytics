@@ -26,6 +26,9 @@ const getDbChlistFromTag = async (tag: string) => {
   const url = dbEndpoint + "/chlist?ch_NaniTag=" + tag;
   console.log(url);
   const res = await dbFetcher(url);
+  if (res.status !== 200) {
+    throw new Error(await res.json());
+  }
   const data = await chlistParsed(res);
   if (data.result.length > 1) {
     throw new Error("nAniTag is not unique");
