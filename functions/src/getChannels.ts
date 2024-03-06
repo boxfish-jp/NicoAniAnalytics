@@ -31,6 +31,7 @@ const getChannels = async (Nanime: string) => {
       title: string;
       thumb: string;
       NanimeDetail: string;
+      NaniTag: string;
       detail: string;
       latestFree: boolean;
       premium: boolean;
@@ -69,10 +70,16 @@ const getChannels = async (Nanime: string) => {
           const NanimeDetail =
             "https://anime.nicovideo.jp" + getNani[0].split("?from=")[0];
 
+          const NaniTag = NanimeDetail.replace(
+            /https:\/\/anime\.nicovideo\.jp\/detail\/(.*?)\/index\.html/,
+            "$1"
+          );
+
           const document = {
             title: title,
             thumb: thumb,
             NanimeDetail: NanimeDetail,
+            NaniTag: NaniTag,
             detail: detail,
             latestFree: latestFree,
             premium: premium,

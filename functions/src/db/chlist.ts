@@ -88,7 +88,8 @@ const createChlist = async (
   console.log(url);
   const res = await dbFetcher(url);
   if (res.status != 200) {
-    throw new Error("create season failed");
+    console.log(await res.json());
+    throw new Error("Failed to create chlist");
   }
 };
 

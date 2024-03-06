@@ -37,6 +37,14 @@ const getDbVideosFromCh = async (ch_id: number) => {
   return data.result;
 };
 
+const getDbVideosFromSeason = async (syear: number, sseason: number) => {
+  const url = dbEndpoint + "/videos?syear=" + syear + "&sseason=" + sseason;
+  console.log(url);
+  const res = await dbFetcher(url);
+  const data = await videosParse(res);
+  return data.result;
+};
+
 const createVideos = async (
   ch_id: number,
   ch_seq: number,
@@ -74,4 +82,9 @@ const createVideos = async (
   }
 };
 
-export { getDbVideosFromId, getDbVideosFromCh, createVideos };
+export {
+  getDbVideosFromId,
+  getDbVideosFromCh,
+  getDbVideosFromSeason,
+  createVideos,
+};

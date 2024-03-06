@@ -1,14 +1,8 @@
 import { dbEndpoint } from "./dbEndpoint";
 import dbFetcher from "./dbFetcher";
 
-const getViewDatafromTime = async (ch_seq_id: number, time: Date) => {
-  const url = dbEndpoint + "/viewData?ch_seq_id=" + ch_seq_id + "&time=" + time;
-  const res = await dbFetcher(url);
-  if (res.status !== 200) {
-    console.log(await res.json());
-    throw new Error("Failed to get viewData");
-  }
-  const data = (await res.json()) as {
+const viewDataParse = async (res: Response) => {
+  return (await res.json()) as {
     result: {
       viewdata_id: number;
       ch_id: number;
@@ -23,6 +17,38 @@ const getViewDatafromTime = async (ch_seq_id: number, time: Date) => {
       diff_mylist: number;
     }[];
   };
+};
+
+const getViewDatafromTime = async (ch_seq_id: number, time: Date) => {
+  const url = dbEndpoint + "/viewData?ch_seq_id=" + ch_seq_id + "&time=" + time;
+  const res = await dbFetcher(url);
+  if (res.status !== 200) {
+    console.log(await res.json());
+    throw new Error("Failed to get viewData");
+  }
+  const data = await viewDataParse(res);
+  return data.result;
+};
+
+const getViewDatafromSeason = async (
+  syear: number,
+  sseason: number,
+  Date: Date
+) => {
+  const url =
+    dbEndpoint +
+    "/viewData?syear=" +
+    syear +
+    "&sseason=" +
+    sseason +
+    "&daddtime=" +
+    Date;
+  const res = await dbFetcher(url);
+  if (res.status !== 200) {
+    console.log(await res.json());
+    throw new Error("Failed to get viewData");
+  }
+  const data = await viewDataParse(res);
   return data.result;
 };
 
@@ -65,4 +91,4 @@ const createViewData = async (
   }
 };
 
-export { getViewDatafromTime, createViewData };
+export { getViewDatafromTime, getViewDatafromSeason, createViewData };

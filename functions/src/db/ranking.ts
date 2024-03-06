@@ -1,14 +1,8 @@
 import dbFetcher from "./dbFetcher";
 import { dbEndpoint } from "./dbEndpoint";
 
-const getRanking = async (ch_id: number, date: Date) => {
-  const url = dbEndpoint + "/ranking?ch_id=" + ch_id + "&date=" + date;
-  const res = await dbFetcher(url);
-  if (res.status !== 200) {
-    console.log(await res.json());
-    throw new Error("Failed to get ranking");
-  }
-  const data = (await res.json()) as {
+const rankingParse = async (res: Response) => {
+  return (await res.json()) as {
     result: {
       ranking_id: number;
       ch_id: number;
@@ -28,6 +22,38 @@ const getRanking = async (ch_id: number, date: Date) => {
       r_diff_mylist: number;
     }[];
   };
+};
+
+const getRanking = async (ch_id: number, date: Date) => {
+  const url = dbEndpoint + "/ranking?ch_id=" + ch_id + "&date=" + date;
+  const res = await dbFetcher(url);
+  if (res.status !== 200) {
+    console.log(await res.json());
+    throw new Error("Failed to get ranking");
+  }
+  const data = await rankingParse(res);
+  return data.result;
+};
+
+const getDbRankingFromSeason = async (
+  syear: number,
+  sseason: number,
+  date: Date
+) => {
+  const url =
+    dbEndpoint +
+    "/ranking?syear=" +
+    syear +
+    "&sseason=" +
+    sseason +
+    "&date=" +
+    date;
+  const res = await dbFetcher(url);
+  if (res.status !== 200) {
+    console.log(await res.json());
+    throw new Error("Failed to get ranking");
+  }
+  const data = await rankingParse(res);
   return data.result;
 };
 
@@ -84,4 +110,4 @@ const createRanking = async (
   }
 };
 
-export { getRanking, createRanking };
+export { getRanking, getDbRankingFromSeason, createRanking };

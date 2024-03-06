@@ -34,9 +34,9 @@ const getAnnict = async (title: string) => {
     };
   }
   return {
-    title: "",
-    siteUrl: "",
-    twitter: "",
+    title: "undefined",
+    siteUrl: "undefined",
+    twitter: "undefined",
   };
 };
 
