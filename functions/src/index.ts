@@ -551,7 +551,7 @@ const test = async () => {
           value.ch_thumb
         );
         // 0.1秒待機
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
   }
@@ -570,8 +570,8 @@ const test = async () => {
           value.ch_seq_desc,
           value.ch_seq_posted
         );
-        // 0.5秒待機
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 0.1秒待機
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
   }
@@ -680,7 +680,7 @@ const test = async () => {
       rankingChlist[i].r_diff_mylist
     );
     // 0.1秒待機
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
   // rankingの更新処理
 
