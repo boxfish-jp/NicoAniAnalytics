@@ -21,14 +21,18 @@ const getDbSeason = async (year: number, season: number) => {
 const createSeason = async (year: number, season: number) => {
   let sdesc = "";
   switch (season) {
-    case 1:
-      sdesc = year + "年" + "冬アニメ";
-    case 2:
-      sdesc = year + "年" + "春アニメ";
-    case 3:
-      sdesc = year + "年" + "夏アニメ";
-    case 4:
-      sdesc = year + "年" + "秋アニメ";
+  case 1:
+    sdesc = year + "年" + "冬アニメ";
+    break;
+  case 2:
+    sdesc = year + "年" + "春アニメ";
+    break;
+  case 3:
+    sdesc = year + "年" + "夏アニメ";
+    break;
+  case 4:
+    sdesc = year + "年" + "秋アニメ";
+    break;
   }
   const url =
     dbEndpoint +

@@ -19,7 +19,7 @@ const videosParse = async (res: Response) => {
 };
 
 const getDbVideosFromId = async (ch_seq_id: number) => {
-  //const url = dbEndpoint + "/videos?ch_seq_id=" + ch_seq_id;
+  // const url = dbEndpoint + "/videos?ch_seq_id=" + ch_seq_id;
   const url = new URL(dbEndpoint + "/videos");
   const params = new URLSearchParams([["ch_seq_id", ch_seq_id.toString()]]);
   url.search = params.toString();
@@ -33,7 +33,7 @@ const getDbVideosFromId = async (ch_seq_id: number) => {
 };
 
 const getDbVideosFromCh = async (ch_id: number) => {
-  //const url = dbEndpoint + "/videos?ch_id=" + ch_id;
+  // const url = dbEndpoint + "/videos?ch_id=" + ch_id;
   const url = new URL(dbEndpoint + "/videos");
   const params = new URLSearchParams([["ch_id", ch_id.toString()]]);
   url.search = params.toString();

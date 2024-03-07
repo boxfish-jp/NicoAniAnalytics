@@ -67,7 +67,7 @@ const createChlist = async (
   ch_site: string,
   ch_thumb: string
 ) => {
-  /*const url =
+  /* const url =
     dbEndpoint +
     "/chlist/create?ch_id=" +
     ch_id +
