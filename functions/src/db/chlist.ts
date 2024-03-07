@@ -23,9 +23,12 @@ const chlistParsed = async (res: Response) => {
 };
 
 const getDbChlistFromTag = async (tag: string) => {
-  const url = dbEndpoint + "/chlist?ch_NaniTag=" + tag;
-  console.log(url);
-  const res = await dbFetcher(url);
+  const url = new URL(dbEndpoint + "/chlist");
+  const params = new URLSearchParams([["ch_NaniTag", tag]]);
+  url.search = params.toString();
+  // const url = dbEndpoint + "/chlist?ch_NaniTag=" + tag;
+  console.log(url.href);
+  const res = await dbFetcher(url.href);
   if (res.status !== 200) {
     throw new Error(await res.json());
   }
@@ -37,9 +40,15 @@ const getDbChlistFromTag = async (tag: string) => {
 };
 
 const getDbChlistFromSeason = async (syear: number, sseason: number) => {
-  const url = dbEndpoint + "/chlist?syear=" + syear + "&sseason=" + sseason;
-  console.log(url);
-  const res = await dbFetcher(url);
+  const url = new URL(dbEndpoint + "/chlist");
+  const params = new URLSearchParams([
+    ["syear", syear.toString()],
+    ["sseason", sseason.toString()],
+  ]);
+  url.search = params.toString();
+  // const url = dbEndpoint + "/chlist?syear=" + syear + "&sseason=" + sseason;
+  console.log(url.href);
+  const res = await dbFetcher(url.href);
   const data = await chlistParsed(res);
   return data.result;
 };
@@ -58,7 +67,7 @@ const createChlist = async (
   ch_site: string,
   ch_thumb: string
 ) => {
-  const url =
+  /*const url =
     dbEndpoint +
     "/chlist/create?ch_id=" +
     ch_id +
@@ -85,8 +94,25 @@ const createChlist = async (
     "&ch_thumb=" +
     ch_thumb +
     "&encode=true";
-  console.log(url);
-  const res = await dbFetcher(url);
+    */
+  const url = new URL(dbEndpoint + "/chlist/create");
+  const params = new URLSearchParams([
+    ["ch_id", ch_id.toString()],
+    ["ch_NaniTag", ch_NaniTag],
+    ["ch_title", ch_title],
+    ["ch_url", ch_url],
+    ["ch_detail", ch_detail],
+    ["ch_LtstFree", ch_LtstFree.toString()],
+    ["ch_PrmFree", ch_PrmFree.toString()],
+    ["syear", syear.toString()],
+    ["sseason", sseason.toString()],
+    ["ch_twt", ch_twt],
+    ["ch_site", ch_site],
+    ["ch_thumb", ch_thumb],
+  ]);
+  url.search = params.toString();
+  console.log(url.href);
+  const res = await dbFetcher(url.href);
   if (res.status != 200) {
     console.log(await res.json());
     throw new Error("Failed to create chlist");

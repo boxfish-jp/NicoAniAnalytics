@@ -35,6 +35,7 @@ const getViewDatafromSeason = async (
   sseason: number,
   Date: Date
 ) => {
+  /*
   const url =
     dbEndpoint +
     "/viewData?syear=" +
@@ -43,7 +44,16 @@ const getViewDatafromSeason = async (
     sseason +
     "&daddtime=" +
     Date;
-  const res = await dbFetcher(url);
+    */
+  const url = new URL(dbEndpoint + "/viewData");
+  const params = new URLSearchParams([
+    ["syear", syear.toString()],
+    ["sseason", sseason.toString()],
+    ["daddtime", Date.toISOString()],
+  ]);
+  url.search = params.toString();
+  console.log(url.href);
+  const res = await dbFetcher(url.href);
   if (res.status !== 200) {
     console.log(await res.json());
     throw new Error("Failed to get viewData");
@@ -63,6 +73,7 @@ const createViewData = async (
   diff_comment: number,
   diff_mylist: number
 ) => {
+  /*
   const url =
     dbEndpoint +
     "/viewData/create?ch_id=" +
@@ -84,7 +95,22 @@ const createViewData = async (
     diff_comment +
     "&diff_mylist=" +
     diff_mylist;
-  const res = await dbFetcher(url);
+    */
+  const url = new URL(dbEndpoint + "/viewData/create");
+  const params = new URLSearchParams([
+    ["ch_id", ch_id.toString()],
+    ["ch_seq", ch_seq.toString()],
+    ["ch_seq_id", ch_seq_id.toString()],
+    ["view_amount", view_amount.toString()],
+    ["comment_amount", comment_amount.toString()],
+    ["mylist_amount", mylist_amount.toString()],
+    ["diff_view", diff_view.toString()],
+    ["diff_comment", diff_comment.toString()],
+    ["diff_mylist", diff_mylist.toString()],
+  ]);
+  url.search = params.toString();
+  console.log(url.href);
+  const res = await dbFetcher(url.href);
   if (res.status !== 200) {
     console.log(await res.json());
     throw new Error("Failed to create viewData");
