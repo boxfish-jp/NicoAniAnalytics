@@ -29,7 +29,7 @@ import getAnnict from "./annict/getAnnict";
 const Nanime = "https://anime.nicovideo.jp/period/now.html";
 
 export const CheckStreaming = onSchedule(
-  { schedule: scheduleTime1, timeoutSeconds: 540 },
+  { schedule: scheduleTime1, timeoutSeconds: 540, memory: "1GiB" },
   async () => {
     // 実行前の時刻を取得
     const before = new Date().getTime();
@@ -130,7 +130,7 @@ export const CheckStreaming = onSchedule(
       if (videoArr.length == 0) {
         continue;
       }
-      videoArr.forEach(async (video) => {
+      for (const video of videoArr) {
         // videosのDB登録作業
         completeVideos.push({
           ch_id: video.video.ch_id,
@@ -184,8 +184,9 @@ export const CheckStreaming = onSchedule(
           video.viewData.NumComment - lastViewData.comment_amount,
           video.viewData.mylist - lastViewData.mylist_amount
         );
+        await new Promise((resolve) => setTimeout(resolve, 100));
         // viewDataのDB登録作業
-      });
+      }
 
       completeChlist.push({
         ch_id: videoArr[0].video.ch_id,
