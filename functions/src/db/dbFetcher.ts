@@ -3,7 +3,7 @@ const dbFetcher = async (url: string) => {
     const data = await fetch(url);
     return data;
   } catch (error) {
-    throw new Error(String(error));
+    throw new Error(String("dbAPIError:" + error));
   }
 };
 
