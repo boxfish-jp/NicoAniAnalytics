@@ -102,7 +102,7 @@ export const CheckStreaming = onRequest(
     const DbViewData = await getViewDatafromSeason(
       channeldic.season.syear,
       channeldic.season.sseason,
-      new Date()
+      new Date(new Date().getTime() - 1000 * 60 * 60 * 23)
     );
 
     let lastFetch = getChannelsData.fetchTime;
@@ -275,7 +275,7 @@ export const CheckStreaming = onRequest(
     const latestRankingChlist = await getDbRankingFromSeason(
       channeldic.season.syear,
       channeldic.season.sseason,
-      new Date()
+      new Date(new Date().getTime() - 1000 * 60 * 60 * 23)
     );
     for (const channel of completeChlist) {
       console.log("now:", channel.ch_NaniTag);
