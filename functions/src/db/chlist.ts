@@ -99,9 +99,9 @@ const createChlist = async (
   const params = new URLSearchParams([
     ["ch_id", ch_id.toString()],
     ["ch_NaniTag", ch_NaniTag],
-    ["ch_title", ch_title],
+    ["ch_title", encodeURIComponent(ch_title)],
     ["ch_url", ch_url],
-    ["ch_detail", ch_detail],
+    ["ch_detail", encodeURIComponent(ch_detail)],
     ["ch_LtstFree", ch_LtstFree.toString()],
     ["ch_PrmFree", ch_PrmFree.toString()],
     ["syear", syear.toString()],
@@ -109,6 +109,7 @@ const createChlist = async (
     ["ch_twt", ch_twt],
     ["ch_site", ch_site],
     ["ch_thumb", ch_thumb],
+    ["encode", "true"],
   ]);
   url.search = params.toString();
   console.log(url.href);

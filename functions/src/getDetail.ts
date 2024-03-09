@@ -2,7 +2,12 @@ import fetcher from "./scraping/fetcher";
 import { getAttrArray } from "./scraping/getPage";
 
 const getDetail = async (url: string, lastFetch: number) => {
-  const fetchData = await fetcher(url, lastFetch);
+  let fetchData = await fetcher(url, lastFetch);
+  lastFetch = fetchData.fetchTime;
+  while (fetchData.dom === "error") {
+    fetchData = await fetcher(url, lastFetch);
+    lastFetch = fetchData.fetchTime;
+  }
   const dom = fetchData.dom;
 
   const getUrl = getAttrArray(

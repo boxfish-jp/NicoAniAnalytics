@@ -9,10 +9,10 @@
 import { initializeApp } from "firebase-admin/app";
 initializeApp();
 
-// import { onRequest } from "firebase-functions/v2/https";
-import { onSchedule } from "firebase-functions/v2/scheduler";
+import { onRequest } from "firebase-functions/v2/https";
+// import { onSchedule } from "firebase-functions/v2/scheduler";
 
-import { scheduleTime1 } from "./scheduleTime";
+// import { scheduleTime1 } from "./scheduleTime";
 import getChannels from "./getChannels";
 import getDetail from "./getDetail";
 import chVideos from "./chVideos";
@@ -28,8 +28,12 @@ import getAnnict from "./annict/getAnnict";
 
 const Nanime = "https://anime.nicovideo.jp/period/now.html";
 
-export const CheckStreaming = onSchedule(
-  { schedule: scheduleTime1, timeoutSeconds: 540, memory: "1GiB" },
+export const CheckStreaming = onRequest(
+  {
+    timeoutSeconds: 3600,
+    cpu: 2,
+    region: "asia-northeast1",
+  },
   async () => {
     // 実行前の時刻を取得
     const before = new Date().getTime();

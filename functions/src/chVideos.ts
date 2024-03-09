@@ -75,8 +75,12 @@ const parseData = (dom: string, ch_id: number) => {
 
 const chVideos = async (chUrl: string, lastFetch: number) => {
   const channelUrl = chUrl + "/video";
-  const channelPage = await fetcher(channelUrl, lastFetch);
+  let channelPage = await fetcher(channelUrl, lastFetch);
   lastFetch = channelPage.fetchTime;
+  while (channelPage.dom === "error") {
+    channelPage = await fetcher(channelUrl, lastFetch);
+    lastFetch = channelPage.fetchTime;
+  }
 
   const $ = Cheerio.load(channelPage.dom);
 
@@ -104,9 +108,13 @@ const chVideos = async (chUrl: string, lastFetch: number) => {
 
   let page = 2;
   while (videos.length < video_amount) {
-    const nextpage = channelUrl + "?page=" + page;
-    const nextPage = await fetcher(nextpage, lastFetch);
+    const nextUrl = channelUrl + "?page=" + page;
+    let nextPage = await fetcher(nextUrl, lastFetch);
     lastFetch = channelPage.fetchTime;
+    while (nextPage.dom === "error") {
+      nextPage = await fetcher(nextUrl, lastFetch);
+      lastFetch = channelPage.fetchTime;
+    }
     const $ = Cheerio.load(nextPage.dom);
     $(".item").each((i, elem) => {
       const parseElem = $(elem).html();

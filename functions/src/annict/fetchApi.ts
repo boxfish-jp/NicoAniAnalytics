@@ -15,7 +15,7 @@ const fetchApi = async (title: string, query: string) => {
     if (!response.ok) {
       const json = await response.json();
       console.error("Network response was not ok", json);
-      throw new Error("Network response was not ok");
+      return "error";
     }
     const data = await response.json();
     return data;

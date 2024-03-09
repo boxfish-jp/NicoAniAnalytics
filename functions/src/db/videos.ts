@@ -94,10 +94,11 @@ const createVideos = async (
     ["ch_seq", ch_seq.toString()],
     ["ch_seq_url", ch_seq_url],
     ["ch_seq_id", ch_seq_id.toString()],
-    ["ch_seq_title", ch_seq_title],
-    ["ch_seq_thumb", ch_seq_thumb],
+    ["ch_seq_title", encodeURIComponent(ch_seq_title)],
+    ["ch_seq_thumb", encodeURIComponent(ch_seq_thumb)],
     ["ch_seq_desc", ch_seq_desc],
     ["ch_seq_posted", ch_seq_posted.toISOString()],
+    ["encode", "true"],
   ]);
   url.search = params.toString();
   console.log(url.href);

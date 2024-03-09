@@ -15,6 +15,13 @@ const getAnnict = async (title: string) => {
         }
     }`;
   const fetchData = await fetchApi(title, query);
+  if (fetchData == "error" || fetchData.data.searchWorks == undefined) {
+    return {
+      title: "undefined",
+      siteUrl: "undefined",
+      twitter: "undefined",
+    };
+  }
   const works = fetchData.data.searchWorks.edges;
   if (works.length != 0) {
     const work = works[0].node;

@@ -4,8 +4,13 @@ import fetcher from "./scraping/fetcher";
 import parseSeason from "./parseSeason";
 
 const getChannels = async (Nanime: string) => {
-  const lastFetch = 0;
-  const SeasonPage = await fetcher(Nanime, lastFetch);
+  let lastFetch = 0;
+  let SeasonPage = await fetcher(Nanime, lastFetch);
+  lastFetch = SeasonPage.fetchTime;
+  while (SeasonPage.dom === "error") {
+    SeasonPage = await fetcher(Nanime, lastFetch);
+    lastFetch = SeasonPage.fetchTime;
+  }
 
   if (SeasonPage.dom == "error") {
     throw new Error("can't get seasonPage");
