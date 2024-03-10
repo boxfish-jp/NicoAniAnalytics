@@ -272,96 +272,104 @@ export const CheckStreaming = onRequest(
       r_diff_comment: number;
       r_diff_mylist: number;
     }[] = [];
-    const latestRankingChlist = await getDbRankingFromSeason(
+    const checkranking = await getDbRankingFromSeason(
       channeldic.season.syear,
       channeldic.season.sseason,
-      new Date(new Date().getTime() - 1000 * 60 * 60 * 23)
+      new Date()
     );
-    for (const channel of completeChlist) {
-      console.log("now:", channel.ch_NaniTag);
-      const viewDataes = completeViewData.filter(
-        (value) => value.ch_id == channel.ch_id
+    if (checkranking.length == 0) {
+      const latestRankingChlist = await getDbRankingFromSeason(
+        channeldic.season.syear,
+        channeldic.season.sseason,
+        new Date(new Date().getTime() - 1000 * 60 * 60 * 23)
       );
-      let total_View = 0;
-      let total_comment = 0;
-      let total_mylist = 0;
-      let current_seq = 0;
-      for (const viewData of viewDataes) {
-        total_View += viewData.view_amount;
-        total_comment += viewData.comment_amount;
-        total_mylist += viewData.mylist_amount;
-        if (current_seq < viewData.ch_seq) {
-          current_seq = viewData.ch_seq;
+      for (const channel of completeChlist) {
+        console.log("now:", channel.ch_NaniTag);
+        const viewDataes = completeViewData.filter(
+          (value) => value.ch_id == channel.ch_id
+        );
+        let total_View = 0;
+        let total_comment = 0;
+        let total_mylist = 0;
+        let current_seq = 0;
+        for (const viewData of viewDataes) {
+          total_View += viewData.view_amount;
+          total_comment += viewData.comment_amount;
+          total_mylist += viewData.mylist_amount;
+          if (current_seq < viewData.ch_seq) {
+            current_seq = viewData.ch_seq;
+          }
         }
+        const lastRanking = latestRankingChlist.find(
+          (value) => value.ch_id == channel.ch_id
+        );
+        rankingChlist.push({
+          ch_id: channel.ch_id,
+          r_current_seq: current_seq,
+          r_total_view: total_View,
+          r_total_comment: total_comment,
+          r_total_mylist: total_mylist,
+          r_ave_view: Math.round(total_View / viewDataes.length),
+          r_ave_comment: Math.round(total_comment / viewDataes.length),
+          r_ave_mylist: Math.round(total_mylist / viewDataes.length),
+          r_ave_view_rank: 0,
+          r_ave_comment_rank: 0,
+          r_ave_mylist_rank: 0,
+          r_diff_view:
+            lastRanking != undefined
+              ? total_View - lastRanking.r_total_view
+              : total_View,
+          r_diff_comment:
+            lastRanking != undefined
+              ? total_comment - lastRanking.r_total_comment
+              : total_comment,
+          r_diff_mylist:
+            lastRanking != undefined
+              ? total_mylist - lastRanking.r_total_mylist
+              : total_mylist,
+        });
       }
-      const lastRanking = latestRankingChlist.find(
-        (value) => value.ch_id == channel.ch_id
-      );
-      rankingChlist.push({
-        ch_id: channel.ch_id,
-        r_current_seq: current_seq,
-        r_total_view: total_View,
-        r_total_comment: total_comment,
-        r_total_mylist: total_mylist,
-        r_ave_view: Math.round(total_View / viewDataes.length),
-        r_ave_comment: Math.round(total_comment / viewDataes.length),
-        r_ave_mylist: Math.round(total_mylist / viewDataes.length),
-        r_ave_view_rank: 0,
-        r_ave_comment_rank: 0,
-        r_ave_mylist_rank: 0,
-        r_diff_view:
-          lastRanking != undefined
-            ? total_View - lastRanking.r_total_view
-            : total_View,
-        r_diff_comment:
-          lastRanking != undefined
-            ? total_comment - lastRanking.r_total_comment
-            : total_comment,
-        r_diff_mylist:
-          lastRanking != undefined
-            ? total_mylist - lastRanking.r_total_mylist
-            : total_mylist,
-      });
-    }
 
-    const sortView = [...rankingChlist].sort((a, b) => {
-      return b.r_ave_view - a.r_ave_view;
-    });
-    const sortComment = [...rankingChlist].sort((a, b) => {
-      return b.r_ave_comment - a.r_ave_comment;
-    });
-    const sortMylist = [...rankingChlist].sort((a, b) => {
-      return b.r_ave_mylist - a.r_ave_mylist;
-    });
-    for (let i = 0; i < rankingChlist.length; i++) {
-      rankingChlist[i].r_ave_view_rank =
-        sortView.findIndex((value) => value.ch_id == rankingChlist[i].ch_id) +
-        1;
-      rankingChlist[i].r_ave_comment_rank =
-        sortComment.findIndex(
-          (value) => value.ch_id == rankingChlist[i].ch_id
-        ) + 1;
-      rankingChlist[i].r_ave_mylist_rank =
-        sortMylist.findIndex((value) => value.ch_id == rankingChlist[i].ch_id) +
-        1;
-      await createRanking(
-        rankingChlist[i].ch_id,
-        rankingChlist[i].r_current_seq,
-        rankingChlist[i].r_total_view,
-        rankingChlist[i].r_total_comment,
-        rankingChlist[i].r_total_mylist,
-        rankingChlist[i].r_ave_view,
-        rankingChlist[i].r_ave_comment,
-        rankingChlist[i].r_ave_mylist,
-        rankingChlist[i].r_ave_view_rank,
-        rankingChlist[i].r_ave_comment_rank,
-        rankingChlist[i].r_ave_mylist_rank,
-        rankingChlist[i].r_diff_view,
-        rankingChlist[i].r_diff_comment,
-        rankingChlist[i].r_diff_mylist
-      );
-      // 0.1秒待機
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      const sortView = [...rankingChlist].sort((a, b) => {
+        return b.r_ave_view - a.r_ave_view;
+      });
+      const sortComment = [...rankingChlist].sort((a, b) => {
+        return b.r_ave_comment - a.r_ave_comment;
+      });
+      const sortMylist = [...rankingChlist].sort((a, b) => {
+        return b.r_ave_mylist - a.r_ave_mylist;
+      });
+      for (let i = 0; i < rankingChlist.length; i++) {
+        rankingChlist[i].r_ave_view_rank =
+          sortView.findIndex((value) => value.ch_id == rankingChlist[i].ch_id) +
+          1;
+        rankingChlist[i].r_ave_comment_rank =
+          sortComment.findIndex(
+            (value) => value.ch_id == rankingChlist[i].ch_id
+          ) + 1;
+        rankingChlist[i].r_ave_mylist_rank =
+          sortMylist.findIndex(
+            (value) => value.ch_id == rankingChlist[i].ch_id
+          ) + 1;
+        await createRanking(
+          rankingChlist[i].ch_id,
+          rankingChlist[i].r_current_seq,
+          rankingChlist[i].r_total_view,
+          rankingChlist[i].r_total_comment,
+          rankingChlist[i].r_total_mylist,
+          rankingChlist[i].r_ave_view,
+          rankingChlist[i].r_ave_comment,
+          rankingChlist[i].r_ave_mylist,
+          rankingChlist[i].r_ave_view_rank,
+          rankingChlist[i].r_ave_comment_rank,
+          rankingChlist[i].r_ave_mylist_rank,
+          rankingChlist[i].r_diff_view,
+          rankingChlist[i].r_diff_comment,
+          rankingChlist[i].r_diff_mylist
+        );
+        // 0.1秒待機
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
     }
     // rankingの更新処理
 

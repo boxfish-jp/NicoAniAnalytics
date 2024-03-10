@@ -47,21 +47,11 @@ const getDbRankingFromSeason = async (
   sseason: number,
   date: Date
 ) => {
-  /*
-  const url =
-    dbEndpoint +
-    "/ranking?syear=" +
-    syear +
-    "&sseason=" +
-    sseason +
-    "&date=" +
-    date;
-    */
   const url = new URL(dbEndpoint + "/ranking");
   const params = new URLSearchParams([
     ["syear", syear.toString()],
     ["sseason", sseason.toString()],
-    ["date", date.toISOString()],
+    ["raddtime", date.toISOString()],
   ]);
   url.search = params.toString();
   console.log(url.href);
