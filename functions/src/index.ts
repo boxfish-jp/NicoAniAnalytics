@@ -22,6 +22,7 @@ import { createVideos, getDbVideosFromSeason } from "./db/videos";
 import { createViewData, getViewDatafromSeason } from "./db/viewData";
 import { createRanking, getDbRankingFromSeason } from "./db/ranking";
 import getAnnict from "./annict/getAnnict";
+import buildFrontEnd from "./buildFrontEnd";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -372,7 +373,7 @@ export const CheckStreaming = onRequest(
       }
     }
     // rankingの更新処理
-
+    await buildFrontEnd();
     // 実行後の時刻を取得
     const after = new Date().getTime();
     // 実行時間を計算
