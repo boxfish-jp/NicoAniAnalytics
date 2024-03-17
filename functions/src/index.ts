@@ -28,6 +28,7 @@ import buildFrontEnd from "./buildFrontEnd";
 // https://firebase.google.com/docs/functions/typescript
 
 const Nanime = "https://anime.nicovideo.jp/period/now.html";
+const register = true;
 
 export const CheckStreaming = onRequest(
   {
@@ -178,17 +179,19 @@ export const CheckStreaming = onRequest(
           diff_comment: video.viewData.NumComment - lastViewData.comment_amount,
           diff_mylist: video.viewData.mylist - lastViewData.mylist_amount,
         });
-        await createViewData(
-          video.video.ch_id,
-          video.video.ch_seq,
-          video.video.ch_seq_id,
-          video.viewData.viewer,
-          video.viewData.NumComment,
-          video.viewData.mylist,
-          video.viewData.viewer - lastViewData.view_amount,
-          video.viewData.NumComment - lastViewData.comment_amount,
-          video.viewData.mylist - lastViewData.mylist_amount
-        );
+        if (register) {
+          await createViewData(
+            video.video.ch_id,
+            video.video.ch_seq,
+            video.video.ch_seq_id,
+            video.viewData.viewer,
+            video.viewData.NumComment,
+            video.viewData.mylist,
+            video.viewData.viewer - lastViewData.view_amount,
+            video.viewData.NumComment - lastViewData.comment_amount,
+            video.viewData.mylist - lastViewData.mylist_amount
+          );
+        }
         await new Promise((resolve) => setTimeout(resolve, 100));
         // viewDataのDB登録作業
       }
@@ -239,7 +242,7 @@ export const CheckStreaming = onRequest(
     if (completeVideos.length > DbVideos.length) {
       for (const value of completeVideos) {
         const check = DbVideos.find((val) => val.ch_seq_id == value.ch_seq_id);
-        if (check == undefined) {
+        if (check == undefined && register) {
           await createVideos(
             value.ch_id,
             value.ch_seq,
