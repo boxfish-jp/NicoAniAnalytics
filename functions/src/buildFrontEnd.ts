@@ -8,7 +8,7 @@ const buildFrontEnd = async () => {
     console.log("FRONTEND_WEBHOOK is not defined");
     return;
   }
-  await fetch(url);
+  await fetch(url, { method: "POST" });
 };
 
 export default buildFrontEnd;
