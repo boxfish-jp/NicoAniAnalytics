@@ -28,7 +28,7 @@ import buildFrontEnd from "./buildFrontEnd";
 // https://firebase.google.com/docs/functions/typescript
 
 const Nanime = "https://anime.nicovideo.jp/period/now.html";
-const register = true;
+let register = true;
 
 export const CheckStreaming = onRequest(
   {
@@ -106,6 +106,15 @@ export const CheckStreaming = onRequest(
       channeldic.season.sseason,
       new Date(new Date().getTime() - 1000 * 60 * 60 * 23)
     );
+
+    const checkViewData = await getViewDatafromSeason(
+      channeldic.season.syear,
+      channeldic.season.sseason,
+      new Date(new Date().getTime() + 1000 * 60 * 30)
+    );
+    if (checkViewData.length != 0) {
+      register = false;
+    }
 
     let lastFetch = getChannelsData.fetchTime;
     // let chListLength = 0;
