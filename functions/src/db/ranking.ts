@@ -45,13 +45,19 @@ const getRanking = async (ch_id: number, date: Date) => {
 const getDbRankingFromSeason = async (
   syear: number,
   sseason: number,
-  date: Date
+  date: Date,
+  loose? : string
 ) => {
   const url = new URL(dbEndpoint + "/ranking");
-  const params = new URLSearchParams([
+  const params = loose == undefined ? new URLSearchParams([
     ["syear", syear.toString()],
     ["sseason", sseason.toString()],
     ["raddtime", date.toISOString()],
+  ]) : new URLSearchParams([
+    ["syear", syear.toString()],
+    ["sseason", sseason.toString()],
+    ["raddtime", date.toISOString()],
+    ["loose", loose]
   ]);
   url.search = params.toString();
   console.log(url.href);

@@ -288,7 +288,8 @@ export const CheckStreaming = onRequest(
     const checkranking = await getDbRankingFromSeason(
       channeldic.season.syear,
       channeldic.season.sseason,
-      new Date()
+      new Date(),
+      "strict"
     );
     if (checkranking.length == 0) {
       const latestRankingChlist = await getDbRankingFromSeason(
