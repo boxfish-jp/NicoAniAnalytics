@@ -22,12 +22,10 @@ import buildFrontEnd from "./buildFrontEnd";
 // https://firebase.google.com/docs/functions/typescript
 
 const Nanime = "https://anime.nicovideo.jp/period/now.html";
-let register = true;
+const register = true;
 
 export const CheckStreaming = onRequest(
   {
-    timeoutSeconds: 3600,
-    cpu: 2,
     region: "asia-northeast1",
   },
   async () => {
