@@ -1,3 +1,7 @@
+# build images 
+venv
+__pycache__/
+
 # Compiled JavaScript files
 lib/**/*.js
 lib/**/*.js.map
