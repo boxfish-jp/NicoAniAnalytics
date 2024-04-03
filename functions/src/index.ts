@@ -26,6 +26,8 @@ const register = true;
 
 export const CheckStreaming = onRequest(
   {
+    timeoutSeconds: 3600,
+    cpu: 2,
     region: "asia-northeast1",
   },
   async () => {
