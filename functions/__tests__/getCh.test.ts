@@ -1,5 +1,5 @@
 import getChannels from "../src/getChannels";
-const url = "https://anime.nicovideo.jp/period/now.html";
+const url = "https://anime.nicovideo.jp/period/2024-winter.html";
 
 let res: Awaited<ReturnType<typeof getChannels>>;
 beforeAll(async () => {
