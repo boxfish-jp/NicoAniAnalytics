@@ -1,1 +1,4 @@
-export const dbEndpoint = "https://nico_ani_hono.boxfish893.workers.dev";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+export const dbEndpoint = process.env.DB_ENDPOINT;

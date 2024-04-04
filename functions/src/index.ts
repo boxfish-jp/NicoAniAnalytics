@@ -33,8 +33,8 @@ export const CheckStreaming = onRequest(
   async () => {
     // 実行前の時刻を取得
     const before = new Date().getTime();
-    const season = await main(Nanime, register);
-
+    await main(Nanime, register);
+    /*
     const thisMonth = new Date().getMonth() + 1;
 
     if (thisMonth == 1 || thisMonth == 4 || thisMonth == 7 || thisMonth == 10) {
@@ -43,6 +43,7 @@ export const CheckStreaming = onRequest(
       const preSeasonUrl = `https://anime.nicovideo.jp/period/${pageName}.html`;
       await main(preSeasonUrl, register);
     }
+    */
     await buildFrontEnd();
     // 実行後の時刻を取得
     const after = new Date().getTime();
