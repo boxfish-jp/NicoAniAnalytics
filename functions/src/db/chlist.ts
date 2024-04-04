@@ -13,8 +13,6 @@ const chlistParsed = async (res: Response) => {
       ch_detail: string;
       ch_LtstFree: number;
       ch_PrmFree: number;
-      syear: number;
-      sseason: number;
       ch_twt: string;
       ch_site: string;
       ch_thumb: string;
