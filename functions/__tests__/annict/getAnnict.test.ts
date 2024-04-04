@@ -1,4 +1,4 @@
-import getAnnict from "../src/annict/getAnnict";
+import getAnnict from "../../src/annict/getAnnict";
 type annictDataType = Awaited<ReturnType<typeof getAnnict>>;
 
 let annictData: annictDataType;

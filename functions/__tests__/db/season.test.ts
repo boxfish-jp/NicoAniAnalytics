@@ -1,4 +1,4 @@
-import { getDbSeason } from "../src/db/season";
+import { getDbSeason } from "../../src/db/season";
 
 let getData: Awaited<ReturnType<typeof getDbSeason>>;
 beforeAll(async () => {

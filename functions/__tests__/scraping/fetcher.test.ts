@@ -1,4 +1,4 @@
-import fetcher from "../src/scraping/fetcher";
+import fetcher from "../../src/scraping/fetcher";
 
 describe("fetcher", () => {
   test("urlからページを取得する", async () => {
