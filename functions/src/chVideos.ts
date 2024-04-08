@@ -44,13 +44,13 @@ const parseData = (dom: string, ch_id: number) => {
   const ch_seq_posted = new Date(getPostDate[0]);
 
   const getView = getTagArray("", ".view var", "", dom);
-  const view = Number(getView[0].replace(",", ""));
+  const view = Number(getView[0].replace(/,/g, ""));
 
   const getMylist = getTagArray("", ".mylist var", "", dom);
-  const mylist = Number(getMylist[0].replace(",", ""));
+  const mylist = Number(getMylist[0].replace(/,/g, ""));
 
   const getComment = getTagArray("", ".comment var", "", dom);
-  const comment = Number(getComment[0].replace(",", ""));
+  const comment = Number(getComment[0].replace(/,/g, ""));
 
   return {
     update: new Date().getTime(),

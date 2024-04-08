@@ -14,8 +14,8 @@ import { onRequest } from "firebase-functions/v2/https";
 
 // import { scheduleTime1 } from "./scheduleTime";
 import main from "./main";
-import beforeSeason from "./beforeSeason";
-import stringfySeason from "./stringfySeason";
+// import beforeSeason from "./beforeSeason";
+// import stringfySeason from "./stringfySeason";
 import buildFrontEnd from "./buildFrontEnd";
 
 // Start writing functions
