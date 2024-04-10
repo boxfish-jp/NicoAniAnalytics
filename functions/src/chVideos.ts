@@ -34,8 +34,8 @@ const parseData = (dom: string, ch_id: number) => {
   const getThumb = getAttrArray("", ".item_left img", "src", "", dom);
   const ch_seq_thumb = getThumb[0];
 
-  const getLength = getTagArray("", "span.br.badge.length", "", dom);
-  const lengthMin = getLength[0].split(":")[0];
+  const getLength = getTagArray("", "span.c-labelOnThumbnail", "", dom);
+  const lengthMin = getLength[1].split(":")[0];
 
   const getDescription = getTagArray("description", "p", "", dom);
   const ch_seq_desc = getDescription[0].trim();
