@@ -1,4 +1,4 @@
-import getAnnict from "../src/annict/getAnnict";
+import getAnnict from "../../src/annict/getAnnict";
 type annictDataType = Awaited<ReturnType<typeof getAnnict>>;
 
 let annictData: annictDataType;
@@ -17,7 +17,6 @@ describe("getAnnict", () => {
     ).toBeTruthy();
   });
   test("officialSiteUrl", () => {
-    console.log(annictData.siteUrl);
     expect(
       [
         "https://delicious-in-dungeon.com/",

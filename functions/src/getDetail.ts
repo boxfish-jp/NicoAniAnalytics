@@ -2,7 +2,12 @@ import fetcher from "./scraping/fetcher";
 import { getAttrArray } from "./scraping/getPage";
 
 const getDetail = async (url: string, lastFetch: number) => {
-  const fetchData = await fetcher(url, lastFetch);
+  let fetchData = await fetcher(url, lastFetch);
+  lastFetch = fetchData.fetchTime;
+  while (fetchData.dom === "error") {
+    fetchData = await fetcher(url, lastFetch);
+    lastFetch = fetchData.fetchTime;
+  }
   const dom = fetchData.dom;
 
   const getUrl = getAttrArray(
@@ -12,13 +17,23 @@ const getDetail = async (url: string, lastFetch: number) => {
     "https://ch.nicovideo.jp/",
     dom
   );
+  let chUrl = "";
   for (url of getUrl) {
     if (!url.startsWith("https://ch.nicovideo.jp/search/")) {
       url = url.split("?")[0];
-      return { chUrl: url, fetchTime: fetchData.fetchTime };
+      chUrl = url;
     }
   }
-  return { chUrl: "", fetchTime: fetchData.fetchTime };
+
+  const getSiteUrl = getAttrArray("UcsAu", "a", "href", "", dom);
+  let siteUrl = "undefined";
+  for (url of getSiteUrl) {
+    if (!url.startsWith("https://dic.nicovideo.jp")) {
+      siteUrl = url;
+    }
+  }
+
+  return { chUrl: chUrl, siteUrl: siteUrl, fetchTime: fetchData.fetchTime };
 };
 
 export default getDetail;

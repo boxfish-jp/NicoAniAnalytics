@@ -1,10 +1,16 @@
 import Cheerio from "cheerio";
 import { getAttrArray, getTagArray } from "./scraping/getPage";
 import fetcher from "./scraping/fetcher";
+import parseSeason from "./parseSeason";
 
 const getChannels = async (Nanime: string) => {
-  const lastFetch = 0;
-  const SeasonPage = await fetcher(Nanime, lastFetch);
+  let lastFetch = 0;
+  let SeasonPage = await fetcher(Nanime, lastFetch);
+  lastFetch = SeasonPage.fetchTime;
+  while (SeasonPage.dom === "error") {
+    SeasonPage = await fetcher(Nanime, lastFetch);
+    lastFetch = SeasonPage.fetchTime;
+  }
 
   if (SeasonPage.dom == "error") {
     throw new Error("can't get seasonPage");
@@ -18,14 +24,19 @@ const getChannels = async (Nanime: string) => {
   );
 
   if (ogImage.length != 0) {
-    const season = ogImage[0]
+    const seasonData = ogImage[0]
       .split("https://anime.nicovideo.jp/assets/images/")[1]
       .split(".jpg")[0];
 
+    const season = parseSeason(seasonData);
+    if (season == "error") {
+      throw new Error("can't parse season");
+    }
     const channelArr: {
       title: string;
       thumb: string;
       NanimeDetail: string;
+      NaniTag: string;
       detail: string;
       latestFree: boolean;
       premium: boolean;
@@ -64,10 +75,16 @@ const getChannels = async (Nanime: string) => {
           const NanimeDetail =
             "https://anime.nicovideo.jp" + getNani[0].split("?from=")[0];
 
+          const NaniTag = NanimeDetail.replace(
+            /https:\/\/anime\.nicovideo\.jp\/detail\/(.*?)\/index\.html/,
+            "$1"
+          );
+
           const document = {
             title: title,
             thumb: thumb,
             NanimeDetail: NanimeDetail,
+            NaniTag: NaniTag,
             detail: detail,
             latestFree: latestFree,
             premium: premium,

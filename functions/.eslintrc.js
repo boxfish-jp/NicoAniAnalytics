@@ -29,5 +29,6 @@ module.exports = {
     "valid-jsdoc": "off",
     "import/no-named-as-default-member": "off",
     "import/no-named-as-default": "off",
+    camelcase: "off",
   },
 };
